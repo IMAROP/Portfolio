@@ -1,0 +1,2688 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Rishabh Singh (Trivioner / imarop) — Full-Stack &amp; Bot Systems Portfolio</title>
+
+  <!-- Custom Fonts: Syne (Display), Outfit (Geometric Sans), Space Mono (Technical) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Devicon Tech Stack Vector Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
+  <!-- Three.js, GSAP + ScrollTrigger, and Lucide Vector Icons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       RISHABH SINGH PORTFOLIO — PLAYING-CARD 3D DECK & KINETIC DARK STUDIO
+       ========================================================================== */
+    :root {
+      --bg-0: #040508;
+      --bg-1: #0A0D14;
+      --bg-2: #111622;
+      --surface: rgba(16, 20, 31, 0.78);
+      --surface-strong: rgba(20, 25, 39, 0.94);
+      --line: rgba(255, 255, 255, 0.09);
+      --line-strong: rgba(255, 255, 255, 0.22);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --accent-volt: #D4FF00;
+      --accent-cobalt: #3B82F6;
+      --accent-crimson: #FF2E54;
+      --accent-mint: #00F5A0;
+      --accent-violet: #A855F7;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-0);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: var(--bg-0);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Subtle Studio Film Grain */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 35;
+      opacity: 0.032;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Smooth Constellation & 3D Wireframe Background Canvas */
+    #ambientCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Custom Desktop Cursor Ring */
+    .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid var(--accent-volt);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 120;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+      mix-blend-mode: difference;
+      display: none;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cursor-ring {
+        display: block;
+      }
+    }
+
+    /* Motion Stage for Smooth Velocity Blur */
+    #motionStage {
+      will-change: transform, filter;
+      transform-origin: center center;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 1.15rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (min-width: 768px) {
+      .wrap {
+        padding: 0 2.25rem;
+      }
+    }
+
+    /* ==========================================================================
+       TOP HEADER & MOBILE DOCK
+       ========================================================================== */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(4, 5, 8, 0.8);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      background: var(--bg-2);
+      flex-shrink: 0;
+    }
+    .brand-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .alias-pill {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(212, 255, 0, 0.12);
+      color: var(--accent-volt);
+      border: 1px solid rgba(212, 255, 0, 0.3);
+      letter-spacing: 0.03em;
+    }
+
+    .desktop-nav {
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      padding: 0.28rem;
+      border-radius: 999px;
+    }
+
+    @media (min-width: 820px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    .nav-item {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-item:hover {
+      color: var(--bg-0);
+      background: var(--accent-volt);
+      font-weight: 700;
+    }
+
+    .availability-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: #E2E8F0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 255, 255, 0.03);
+      flex-shrink: 0;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-mint);
+      box-shadow: 0 0 10px var(--accent-mint);
+      animation: pulseGlow 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.25); }
+    }
+
+    /* Mobile Bottom Dock */
+    .mobile-bottom-dock {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0.4rem;
+      border-radius: 999px;
+      background: rgba(10, 12, 18, 0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+      width: calc(100% - 1.5rem);
+      max-width: 400px;
+    }
+
+    @media (min-width: 820px) {
+      .mobile-bottom-dock {
+        display: none;
+      }
+    }
+
+    .dock-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 0.38rem 0.65rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+    .dock-link:hover,
+    .dock-link:active {
+      color: var(--accent-volt);
+      background: rgba(212, 255, 0, 0.09);
+    }
+
+    /* ==========================================================================
+       01 // HERO SECTION
+       ========================================================================== */
+    .hero-section {
+      padding: 2.75rem 0 3.5rem;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .hero-section {
+        padding: 5rem 0 4.5rem;
+      }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+      align-items: center;
+    }
+
+    @media (min-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 3.5rem;
+      }
+    }
+
+    .eyebrow-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    .volt-text {
+      color: var(--accent-volt);
+    }
+
+    .stroke-text {
+      -webkit-text-stroke: 1.5px rgba(248, 250, 252, 0.85);
+      color: transparent;
+    }
+
+    .alias-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .alias-badge {
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line-strong);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .hero-lead {
+      font-size: clamp(0.98rem, 1.8vw, 1.12rem);
+      color: #D1D5DB;
+      max-width: 620px;
+      margin-bottom: 0.95rem;
+    }
+
+    .hero-sub {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 1.85rem;
+    }
+
+    .btn-volt {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      padding: 0.9rem 1.65rem;
+      border-radius: 10px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--accent-volt);
+      color: var(--bg-0);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    .btn-volt:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 14px 35px -6px rgba(212, 255, 0, 0.45);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.88rem 1.4rem;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border: 1px solid var(--line-strong);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent-volt);
+      color: var(--accent-volt);
+      background: rgba(212, 255, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Orbital Centerpiece Card */
+    .orbital-card {
+      background: linear-gradient(160deg, rgba(20, 24, 36, 0.86) 0%, rgba(9, 11, 17, 0.96) 100%);
+      border: 1px solid var(--line-strong);
+      border-radius: 24px;
+      padding: 1.85rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75);
+    }
+
+    .orbital-stage {
+      position: relative;
+      width: 176px;
+      height: 176px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.15rem;
+    }
+
+    .orbital-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      animation: spinOrbit 22s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spinOrbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .logo-frame {
+      width: 116px;
+      height: 116px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid var(--accent-volt);
+      background: var(--bg-0);
+      box-shadow: 0 0 36px rgba(212, 255, 0, 0.22);
+      position: relative;
+      z-index: 2;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .orbital-card:hover .logo-frame {
+      transform: scale(1.06) rotate(-2deg);
+    }
+    .logo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      width: 100%;
+      margin-top: 1.15rem;
+      padding-top: 1.15rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .spec-cell {
+      background: rgba(4, 5, 8, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.6rem 0.35rem;
+    }
+    .spec-val {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+    .spec-key {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    /* ==========================================================================
+       TECH ARSENAL MARQUEE
+       ========================================================================== */
+    .tech-ribbon {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(10, 12, 18, 0.88);
+      padding: 1rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      z-index: 10;
+    }
+
+    .tech-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 2.25rem;
+      animation: ribbonScroll 26s linear infinite;
+      will-change: transform, filter;
+    }
+
+    @keyframes ribbonScroll {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    .tech-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-primary);
+    }
+    .tech-pill i {
+      font-size: 1.1rem;
+      color: var(--accent-volt);
+    }
+
+    /* ==========================================================================
+       02 // PLAYING-CARD SHAPED 3D REVOLVING PROJECT DECK
+       (True Vertical Playing Card Proportions 2.5 : 3.5 + Corner Indices + Foil)
+       ========================================================================== */
+    .section-block {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .section-block {
+        padding: 5.5rem 0;
+      }
+    }
+
+    .section-head {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .section-head {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+    }
+
+    .sec-index {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--accent-volt);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.3rem;
+    }
+
+    .sec-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.85rem, 4vw, 3rem);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+
+    .deck-controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .revolve-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      transition: all 0.25s ease;
+    }
+    .revolve-btn:hover {
+      background: var(--accent-volt);
+      color: var(--bg-0);
+      border-color: var(--accent-volt);
+      transform: scale(1.06);
+    }
+
+    /* 3D Playing Card Stage */
+    .playing-deck-viewport {
+      position: relative;
+      width: 100%;
+      height: 550px;
+      perspective: 1500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      margin: 0.5rem 0 1.75rem;
+      touch-action: pan-y;
+    }
+
+    @media (max-width: 640px) {
+      .playing-deck-viewport {
+        height: 525px;
+      }
+    }
+
+    .playing-deck-ring {
+      position: relative;
+      /* Authentic Playing-Card Vertical Aspect Ratio (~ 2.5 : 3.5) */
+      width: 340px;
+      height: 495px;
+      transform-style: preserve-3d;
+      will-change: transform, filter;
+    }
+
+    @media (max-width: 420px) {
+      .playing-deck-ring {
+        width: 300px;
+        height: 465px;
+      }
+    }
+
+    /* Authentic Board-Game / Playing Card Structure */
+    .playing-card {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(160deg, #161B29 0%, #07090F 55%, #111522 100%);
+      border: 2px solid rgba(255, 255, 255, 0.24);
+      border-radius: 24px;
+      padding: 1.35rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 30px 70px -12px rgba(0, 0, 0, 0.92), inset 0 0 28px rgba(255, 255, 255, 0.03);
+      transition: 
+        transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 0.45s ease,
+        border-color 0.35s ease,
+        box-shadow 0.45s ease;
+      will-change: transform, opacity, filter;
+      overflow: hidden;
+    }
+
+    /* Ornamental Inner Playing-Card Frame Border */
+    .playing-card::before {
+      content: '';
+      position: absolute;
+      inset: 9px;
+      border-radius: 17px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      pointer-events: none;
+      z-index: 1;
+      transition: border-color 0.35s ease;
+    }
+
+    /* Holographic Foil Sheen on Playing Card */
+    .playing-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        360px circle at var(--cx, 50%) var(--cy, 30%),
+        rgba(255, 255, 255, 0.12),
+        transparent 55%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .playing-card:hover::after {
+      opacity: 1;
+    }
+
+    /* Suit Themes */
+    .playing-card.suit-hearts[data-pos="0"] {
+      border-color: var(--accent-crimson);
+      box-shadow: 0 32px 85px -16px rgba(255, 46, 84, 0.35), inset 0 0 30px rgba(255, 46, 84, 0.08);
+    }
+    .playing-card.suit-hearts[data-pos="0"]::before {
+      border-color: rgba(255, 46, 84, 0.35);
+    }
+
+    .playing-card.suit-spades[data-pos="0"] {
+      border-color: var(--accent-cobalt);
+      box-shadow: 0 32px 85px -16px rgba(59, 130, 246, 0.35), inset 0 0 30px rgba(59, 130, 246, 0.08);
+    }
+    .playing-card.suit-spades[data-pos="0"]::before {
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .playing-card.suit-joker[data-pos="0"] {
+      border-color: var(--accent-volt);
+      box-shadow: 0 32px 85px -16px rgba(212, 255, 0, 0.3), inset 0 0 30px rgba(212, 255, 0, 0.07);
+    }
+    .playing-card.suit-joker[data-pos="0"]::before {
+      border-color: rgba(212, 255, 0, 0.35);
+    }
+
+    /* 3-Card Revolving Fan Positions: Center (0), Right (+1), Left (-1) */
+    .playing-card[data-pos="0"] {
+      transform: translate3d(0, 0, 120px) rotateY(0deg) rotateZ(0deg) scale(1);
+      opacity: 1;
+      z-index: 10;
+    }
+
+    .playing-card[data-pos="1"] {
+      transform: translate3d(78%, 14px, -85px) rotateY(-26deg) rotateZ(7deg) scale(0.86);
+      opacity: 0.65;
+      z-index: 5;
+      filter: blur(2px);
+    }
+
+    .playing-card[data-pos="-1"] {
+      transform: translate3d(-78%, 14px, -85px) rotateY(26deg) rotateZ(-7deg) scale(0.86);
+      opacity: 0.65;
+      z-index: 5;
+      filter: blur(2px);
+    }
+
+    @media (max-width: 760px) {
+      .playing-card[data-pos="1"] {
+        transform: translate3d(24%, 18px, -80px) rotateY(-16deg) rotateZ(5deg) scale(0.88);
+        opacity: 0.42;
+      }
+      .playing-card[data-pos="-1"] {
+        transform: translate3d(-24%, 18px, -80px) rotateY(16deg) rotateZ(-5deg) scale(0.88);
+        opacity: 0.42;
+      }
+    }
+
+    /* Motion Blur Burst when Revolving & Zooming */
+    .revolving-blur-burst .playing-card {
+      filter: url(#svgHorizontalBlur) blur(7px) !important;
+    }
+
+    .card-zooming-out {
+      transform: translate3d(0, 0, 380px) scale(1.22) !important;
+      filter: url(#svgZoomBlur) blur(16px) !important;
+      opacity: 0 !important;
+      transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    /* Playing Card Corner Indices (Top-Left & Inverted Bottom-Right) */
+    .card-corner-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 3;
+    }
+
+    .card-rank-suit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+    }
+
+    .suit-symbol {
+      width: 16px;
+      height: 16px;
+      margin-top: 3px;
+    }
+
+    .card-class-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.22rem 0.55rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line-strong);
+      color: #E2E8F0;
+    }
+
+    /* Playing Card Center Emblem / Artwork Medallion */
+    .card-center-art {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: 0.4rem 0;
+    }
+
+    .card-medallion {
+      width: 86px;
+      height: 86px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 2px solid var(--line-strong);
+      background: var(--bg-0);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .playing-card:hover .card-medallion {
+      transform: scale(1.08) translateY(-3px);
+    }
+    .card-medallion img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-project-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.38rem;
+      color: #fff;
+      line-height: 1.12;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .card-project-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-lore-box {
+      background: rgba(4, 5, 8, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.75rem 0.85rem;
+      font-size: 0.8rem;
+      color: #CBD5E1;
+      line-height: 1.5;
+      margin-bottom: 0.8rem;
+      width: 100%;
+    }
+
+    .card-stat-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.35rem;
+      width: 100%;
+    }
+
+    .card-pill {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.48rem;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      color: #E2E8F0;
+    }
+
+    /* Playing Card Bottom Bar + Inverted Corner Rank */
+    .card-corner-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 3;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .card-open-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--accent-volt);
+    }
+
+    .card-rank-inverted {
+      transform: rotate(180deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+
+    /* Carousel Dots */
+    .carousel-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-top: 0.25rem;
+    }
+
+    .dot-btn {
+      width: 28px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      transition: all 0.3s ease;
+    }
+    .dot-btn.active {
+      width: 48px;
+      background: var(--accent-volt);
+      box-shadow: 0 0 12px rgba(212, 255, 0, 0.5);
+    }
+
+    /* ==========================================================================
+       03 // SKILLS & ENGINEERING CAPABILITIES BENTO GRID
+       ========================================================================== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .bento-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .bento-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(212, 255, 0, 0.45);
+    }
+
+    .vector-box {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-volt);
+      margin-bottom: 1.2rem;
+    }
+
+    .bento-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .bento-body {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      line-height: 1.58;
+      margin-bottom: 1.15rem;
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
+
+    .chip {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      text-transform: uppercase;
+      padding: 0.22rem 0.52rem;
+      border-radius: 5px;
+      background: rgba(4, 5, 8, 0.85);
+      border: 1px solid var(--line);
+      color: #CBD5E1;
+    }
+
+    /* Engineering Process Timeline Strip */
+    .process-strip {
+      margin-top: 2.25rem;
+      background: rgba(10, 13, 20, 0.85);
+      border: 1px solid var(--line-strong);
+      border-radius: 22px;
+      padding: 1.65rem;
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1.1rem;
+    }
+
+    @media (min-width: 640px) {
+      .process-steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .process-steps {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .process-step {
+      background: rgba(4, 5, 8, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.1rem;
+      transition: border-color 0.25s ease;
+    }
+    .process-step:hover {
+      border-color: var(--accent-volt);
+    }
+
+    /* ==========================================================================
+       04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & DIRECT CONTACT
+       ========================================================================== */
+    .connect-box {
+      background: linear-gradient(155deg, rgba(18, 22, 34, 0.92) 0%, rgba(6, 8, 13, 0.98) 100%);
+      border: 1px solid var(--line-strong);
+      border-radius: 28px;
+      padding: 2rem 1.35rem;
+    }
+
+    @media (min-width: 768px) {
+      .connect-box {
+        padding: 3.25rem;
+      }
+    }
+
+    .connect-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (min-width: 900px) {
+      .connect-grid {
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 3rem;
+      }
+    }
+
+    .directory-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .channel-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      border-radius: 16px;
+      background: rgba(4, 5, 8, 0.88);
+      border: 1px solid var(--line-strong);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .channel-card:hover {
+      border-color: var(--accent-volt);
+      transform: translateX(6px);
+      background: rgba(212, 255, 0, 0.05);
+    }
+
+    .channel-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .channel-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-volt);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL
+       ========================================================================== */
+    .takeover-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(3, 4, 8, 0.92);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    @media (min-width: 768px) {
+      .takeover-backdrop {
+        padding: 1.5rem;
+      }
+    }
+
+    .takeover-backdrop.is-open {
+      display: flex;
+    }
+
+    .takeover-panel {
+      width: 100%;
+      height: 100vh;
+      max-width: 1120px;
+      overflow-y: auto;
+      background: linear-gradient(165deg, #101420 0%, #06080E 100%);
+      border: 1px solid var(--line-strong);
+      padding: 1.5rem 1.25rem 3.5rem;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95);
+      will-change: transform, filter, opacity;
+    }
+
+    @media (min-width: 768px) {
+      .takeover-panel {
+        height: auto;
+        max-height: 90vh;
+        border-radius: 28px;
+        padding: 2.5rem;
+      }
+    }
+
+    .takeover-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 1.5rem;
+      position: sticky;
+      top: -1.5rem;
+      background: rgba(10, 13, 22, 0.94);
+      backdrop-filter: blur(18px);
+      z-index: 10;
+      padding-top: 0.5rem;
+    }
+
+    .close-takeover-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      padding: 0.6rem 1.1rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--line-strong);
+      color: #fff;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .close-takeover-btn:hover {
+      background: var(--accent-crimson);
+      border-color: var(--accent-crimson);
+    }
+
+    .work-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid var(--line-strong);
+      background: var(--bg-0);
+      flex-shrink: 0;
+    }
+    .work-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .work-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .badge-crimson {
+      background: rgba(255, 46, 84, 0.15);
+      color: #FF8096;
+      border: 1px solid rgba(255, 46, 84, 0.38);
+    }
+
+    .badge-cobalt {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93C5FD;
+      border: 1px solid rgba(59, 130, 246, 0.38);
+    }
+
+    .badge-volt {
+      background: rgba(212, 255, 0, 0.14);
+      color: var(--accent-volt);
+      border: 1px solid rgba(212, 255, 0, 0.35);
+    }
+
+    .work-quote {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #E2E8F0;
+      padding: 0.75rem 1rem;
+      background: rgba(4, 5, 8, 0.8);
+      border-left: 3px solid var(--accent-volt);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.4rem;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.65rem;
+    }
+
+    @media (min-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-box {
+      background: rgba(4, 5, 8, 0.85);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .kpi-num {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.45rem;
+      color: #fff;
+    }
+    .kpi-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .arch-flow {
+      background: rgba(4, 5, 8, 0.9);
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      padding: 1.25rem;
+      margin-bottom: 1.65rem;
+    }
+
+    .arch-nodes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .arch-nodes {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 920px) {
+      .arch-nodes {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .arch-node {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.95rem;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .arch-node:hover {
+      border-color: var(--accent-volt);
+      transform: translateY(-3px);
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.65rem;
+    }
+
+    @media (min-width: 680px) {
+      .module-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .module-box {
+      background: rgba(17, 21, 32, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+
+    .module-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent-volt);
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+
+    .module-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 0.45rem;
+    }
+
+    .module-desc {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.58;
+    }
+
+    .ext-links-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 600px) {
+      .ext-links-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .ext-link-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.95rem 1.15rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-strong);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      transition: all 0.25s ease;
+    }
+    .ext-link-card:hover {
+      border-color: var(--accent-volt);
+      background: rgba(212, 255, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .site-footer {
+      padding: 2.5rem 0 6rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    @media (min-width: 820px) {
+      .site-footer {
+        padding: 2.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HIDDEN SVG MOTION BLUR FILTERS (Silently powers smooth directional blur without showing debug text) -->
+  <svg width="0" height="0" style="position:absolute; pointer-events:none;">
+    <defs>
+      <filter id="svgVerticalBlur" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur id="vBlurNode" in="SourceGraphic" stdDeviation="0, 0" />
+      </filter>
+      <filter id="svgHorizontalBlur" x="-30%" y="-20%" width="160%" height="140%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="14, 1.2" />
+      </filter>
+      <filter id="svgZoomBlur" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="12, 12" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Subtle Studio Film Grain -->
+  <div class="noise-overlay"></div>
+
+  <!-- Custom Desktop Cursor Ring -->
+  <div id="cursorRing" class="cursor-ring"></div>
+
+  <!-- Smooth Glowing Constellation + Aurora Orbs Canvas (Replaces square blue dots) -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- TOP MINIMAL HEADER -->
+  <header class="top-header">
+    <div class="wrap header-row">
+      <a href="#intro" class="brand-mark">
+        <div class="brand-avatar">
+          <img 
+            src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+            alt="Rishabh Singh Logo" 
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-volt);">RS</div>
+        </div>
+        <div class="brand-text">
+          <span>Rishabh Singh</span>
+          <span class="alias-pill">TRIVIONER / IMAROP</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav">
+        <a href="#intro" class="nav-item">01. About</a>
+        <a href="#work" class="nav-item">02. Projects</a>
+        <a href="#capabilities" class="nav-item">03. Skills</a>
+        <a href="#connect" class="nav-item">04. Contact</a>
+      </nav>
+
+      <a href="#connect" class="availability-badge">
+        <span class="status-dot"></span>
+        <span>AVAILABLE FOR PROJECTS</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK -->
+  <nav class="mobile-bottom-dock" aria-label="Mobile Navigation">
+    <a href="#intro" class="dock-link">
+      <i data-lucide="user" style="width:16px; height:16px;"></i>
+      <span>About</span>
+    </a>
+    <a href="#work" class="dock-link">
+      <i data-lucide="layers" style="width:16px; height:16px;"></i>
+      <span>Projects</span>
+    </a>
+    <a href="#capabilities" class="dock-link">
+      <i data-lucide="cpu" style="width:16px; height:16px;"></i>
+      <span>Skills</span>
+    </a>
+    <a href="#connect" class="dock-link">
+      <i data-lucide="send" style="width:16px; height:16px;"></i>
+      <span>Contact</span>
+    </a>
+  </nav>
+
+  <!-- MAIN STAGE -->
+  <div id="motionStage">
+    <main>
+
+      <!-- =================================================================
+           01 // PERSONAL INTRODUCTION
+           ================================================================= -->
+      <section id="intro" class="hero-section">
+        <div class="wrap hero-grid">
+          
+          <div class="gs-hero">
+            <div class="eyebrow-chip">
+              <i data-lucide="terminal" style="width:14px; height:14px; color:var(--accent-volt);"></i>
+              <span>18 Y/O FULL-STACK &amp; BOT DEVELOPER // INDIA</span>
+            </div>
+
+            <h1 class="hero-title">
+              RISHABH <span class="volt-text">SINGH</span><br />
+              <span class="stroke-text">FULL-STACK</span> &amp;<br />
+              BOT ARCHITECT.
+            </h1>
+
+            <div class="alias-banner">
+              <span>KNOWN ONLINE AS</span>
+              <span class="alias-badge">Trivioner</span>
+              <span>&amp;</span>
+              <span class="alias-badge">imarop</span>
+            </div>
+
+            <p class="hero-lead">
+              I’m an 18-year-old developer from India building complete full-stack websites, custom Mini Web Apps, and high-scale Telegram bots from scratch.
+            </p>
+
+            <p class="hero-sub">
+              I engineer every layer end-to-end—responsive frontend interfaces, backend APIs, databases, encrypted cloud storage, and multi-server AI moderation. I combine modern AI tools with months of deep manual systems engineering, security hardening, and stress-testing so my systems can handle thousands of concurrent users without breaking.
+            </p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:0.85rem; align-items:center;">
+              <a href="#work" class="btn-volt">
+                <span>See the Projects I Built</span>
+                <i data-lucide="arrow-down-right" style="width:18px; height:18px;"></i>
+              </a>
+              <a href="#capabilities" class="btn-ghost">
+                <i data-lucide="layers" style="width:16px; height:16px;"></i>
+                <span>What I Build &amp; Master</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Orbital Identity Showcase -->
+          <div class="gs-hero">
+            <div class="orbital-card">
+              <div class="orbital-stage">
+                <svg class="orbital-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="100" r="92" stroke="rgba(212,255,0,0.25)" stroke-width="1.2" stroke-dasharray="6 8" />
+                  <circle cx="100" cy="100" r="76" stroke="rgba(59,130,246,0.28)" stroke-width="1.2" stroke-dasharray="18 10" />
+                  <circle cx="100" cy="8" r="4.5" fill="#D4FF00" />
+                  <circle cx="176" cy="100" r="4" fill="#3B82F6" />
+                </svg>
+
+                <a href="https://ibb.co/LdrMF1b6" target="_blank" rel="noopener noreferrer" class="logo-frame" title="Rishabh Singh Official Logo">
+                  <img 
+                    src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+                    alt="Rishabh Singh Official Logo" 
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                  />
+                  <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:2rem; color:var(--accent-volt);">
+                    RS
+                  </div>
+                </a>
+              </div>
+
+              <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.1em;">
+                TRIVIONER // IMAROP // INDIA
+              </div>
+              <h2 style="font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin-top:0.2rem; text-transform:uppercase;">
+                Rishabh Singh
+              </h2>
+              <p style="font-size:0.84rem; color:var(--text-secondary); max-width:310px; margin-top:0.3rem;">
+                Full-Stack Web Developer &amp; Telegram Bot Architect building production systems and custom client work.
+              </p>
+
+              <div class="spec-grid">
+                <div class="spec-cell">
+                  <div class="spec-val">Full-Stack</div>
+                  <div class="spec-key">Web + API + DB</div>
+                </div>
+                <div class="spec-cell">
+                  <div class="spec-val" style="color:var(--accent-volt);">TG Bots</div>
+                  <div class="spec-key">&amp; Mini Apps</div>
+                </div>
+                <div class="spec-cell">
+                  <div class="spec-val" style="color:var(--accent-cobalt);">AI + Cloud</div>
+                  <div class="spec-key">Encrypted Sys</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TECH STACK RIBBON -->
+      <div class="tech-ribbon" aria-hidden="true">
+        <div class="tech-track" id="techTrack">
+          <span class="tech-pill"><i class="devicon-javascript-plain"></i><span>JavaScript / ES6+</span></span>
+          <span class="tech-pill"><i class="devicon-nodejs-plain"></i><span>Node.js &amp; Backend APIs</span></span>
+          <span class="tech-pill"><i class="devicon-python-plain"></i><span>Python &amp; Bot Engines</span></span>
+          <span class="tech-pill"><i class="devicon-firebase-plain"></i><span>Google Firebase Realtime</span></span>
+          <span class="tech-pill"><i class="devicon-html5-plain"></i><span>HTML5 &amp; Mini WebApps</span></span>
+          <span class="tech-pill"><i class="devicon-css3-plain"></i><span>Modern CSS3 &amp; 3D UI</span></span>
+          <span class="tech-pill"><i class="devicon-linux-plain"></i><span>Multi-Server Architecture</span></span>
+          <span class="tech-pill"><i class="devicon-git-plain"></i><span>Git &amp; Security</span></span>
+          <!-- Seamless loop duplicate -->
+          <span class="tech-pill"><i class="devicon-javascript-plain"></i><span>JavaScript / ES6+</span></span>
+          <span class="tech-pill"><i class="devicon-nodejs-plain"></i><span>Node.js &amp; Backend APIs</span></span>
+          <span class="tech-pill"><i class="devicon-python-plain"></i><span>Python &amp; Bot Engines</span></span>
+          <span class="tech-pill"><i class="devicon-firebase-plain"></i><span>Google Firebase Realtime</span></span>
+          <span class="tech-pill"><i class="devicon-html5-plain"></i><span>HTML5 &amp; Mini WebApps</span></span>
+          <span class="tech-pill"><i class="devicon-css3-plain"></i><span>Modern CSS3 &amp; 3D UI</span></span>
+          <span class="tech-pill"><i class="devicon-linux-plain"></i><span>Multi-Server Architecture</span></span>
+          <span class="tech-pill"><i class="devicon-git-plain"></i><span>Git &amp; Security</span></span>
+        </div>
+      </div>
+
+      <!-- =================================================================
+           02 // PROJECTS I BUILT — PLAYING-CARD SHAPED REVOLVING 3-CARD DECK
+           (Card 1: Date Anyone Robot, Card 2: Command Hub, Card 3: More & Client Builds)
+           ================================================================= -->
+      <section id="work" class="section-block">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="sec-index">01 // SELECTED PORTFOLIO</div>
+              <h2 class="sec-title">Projects I Built</h2>
+            </div>
+            <p style="font-size:0.94rem; color:var(--text-secondary); max-width:490px;">
+              Browse my project cards below. <strong style="color:#fff;">Click on any card</strong> to bring it up close and explore its full functionality, architecture, and live links.
+            </p>
+          </div>
+
+          <!-- Deck Navigation Controls -->
+          <div class="deck-controls-bar">
+            <div style="display:flex; align-items:center; gap:0.65rem;">
+              <button type="button" id="prevCardBtn" class="revolve-btn" aria-label="Previous Project Card">
+                <i data-lucide="chevron-left" style="width:20px; height:20px;"></i>
+              </button>
+              <button type="button" id="nextCardBtn" class="revolve-btn" aria-label="Next Project Card">
+                <i data-lucide="chevron-right" style="width:20px; height:20px;"></i>
+              </button>
+              <button type="button" id="toggleAutoRevolveBtn" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
+                <i data-lucide="refresh-cw" style="width:14px; height:14px;"></i>
+                <span id="autoRevolveLabel">Auto-Cycle: ON</span>
+              </button>
+            </div>
+
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary);">
+              CLICK ANY CARD FOR FULL DETAILS
+            </div>
+          </div>
+
+          <!-- PLAYING-CARD PROPORTIONED 3D REVOLVING STAGE -->
+          <div class="playing-deck-viewport" id="revolveViewport">
+            <div class="playing-deck-ring" id="revolveRing">
+
+              <!-- =========================================================
+                   PLAYING CARD 1 (ACE OF HEARTS): DATE ANYONE ROBOT
+                   ========================================================= -->
+              <article 
+                class="playing-card suit-hearts" 
+                data-index="0" 
+                data-pos="0" 
+                data-target="datebot"
+                id="revolveCard0"
+                role="button"
+                tabindex="0"
+                aria-label="Date Anyone Robot — Click to view full project details"
+              >
+                <!-- Top Playing Card Corner Index -->
+                <div class="card-corner-top">
+                  <div class="card-rank-suit" style="color:var(--accent-crimson);">
+                    <span>A</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </div>
+                  <span class="card-class-tag" style="border-color:rgba(255,46,84,0.4); color:#FF8096;">
+                    7,000+ USERS
+                  </span>
+                </div>
+
+                <!-- Center Medallion & Project Brief -->
+                <div class="card-center-art">
+                  <div class="card-medallion" style="border-color:var(--accent-crimson);">
+                    <img 
+                      src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+                      alt="Date Anyone Robot Logo" 
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
+                  </div>
+
+                  <h3 class="card-project-name">Date Anyone Robot</h3>
+                  <div class="card-project-sub">t.me/DateanyoneRobot</div>
+
+                  <div class="card-lore-box">
+                    Dating &amp; anonymous chat bot with <strong style="color:#fff;">7,000+ users</strong> &amp; <strong style="color:#fff;">11,000+ encrypted photos</strong>. Tinder-style matching, RAM anonymous chat, 2 AI moderation servers &amp; Mini Web App.
+                  </div>
+
+                  <div class="card-stat-pills">
+                    <span class="card-pill">2 AI Servers</span>
+                    <span class="card-pill">RAM Chat</span>
+                    <span class="card-pill">Firebase + TG Cloud</span>
+                    <span class="card-pill">3,000 Live Cap</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
+                <div class="card-corner-bottom">
+                  <span class="card-open-label" style="color:#FF8096;">
+                    <span>Tap to Open Card</span>
+                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                  </span>
+                  <div class="card-rank-inverted" style="color:var(--accent-crimson);">
+                    <span>A</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </div>
+                </div>
+              </article>
+
+              <!-- =========================================================
+                   PLAYING CARD 2 (KING OF SPADES): COMMAND HUB
+                   ========================================================= -->
+              <article 
+                class="playing-card suit-spades" 
+                data-index="1" 
+                data-pos="1" 
+                data-target="cmdhub"
+                id="revolveCard1"
+                role="button"
+                tabindex="0"
+                aria-label="Command Hub — Click to view full project details"
+              >
+                <!-- Top Playing Card Corner Index -->
+                <div class="card-corner-top">
+                  <div class="card-rank-suit" style="color:var(--accent-cobalt);">
+                    <span>K</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/>
+                    </svg>
+                  </div>
+                  <span class="card-class-tag" style="border-color:rgba(59,130,246,0.4); color:#93C5FD;">
+                    GROUP MANAGER
+                  </span>
+                </div>
+
+                <!-- Center Medallion & Project Brief -->
+                <div class="card-center-art">
+                  <div class="card-medallion" style="border-color:var(--accent-cobalt);">
+                    <img 
+                      src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+                      alt="Command Hub Logo" 
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
+                  </div>
+
+                  <h3 class="card-project-name">COMMAND HUB</h3>
+                  <div class="card-project-sub">t.me/CommandHUBRoBOT</div>
+
+                  <div class="card-lore-box">
+                    Moderate, manage &amp; entertain Telegram groups. Features web settings, CAPTCHA, scheduled group close/open locks, bio-link &amp; promo detection, sticker whitelist &amp; 7+ games.
+                  </div>
+
+                  <div class="card-stat-pills">
+                    <span class="card-pill">Bio-Link Scan</span>
+                    <span class="card-pill">Timed Locks</span>
+                    <span class="card-pill">Sticker Whitelist</span>
+                    <span class="card-pill">7+ Mini-Games</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
+                <div class="card-corner-bottom">
+                  <span class="card-open-label" style="color:#93C5FD;">
+                    <span>Tap to Open Card</span>
+                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                  </span>
+                  <div class="card-rank-inverted" style="color:var(--accent-cobalt);">
+                    <span>K</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
+                      <path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/>
+                    </svg>
+                  </div>
+                </div>
+              </article>
+
+              <!-- =========================================================
+                   PLAYING CARD 3 (JOKER / WILD CARD): MORE PROJECTS & CLIENT WORK
+                   ========================================================= -->
+              <article 
+                class="playing-card suit-joker" 
+                data-index="2" 
+                data-pos="-1" 
+                data-target="morework"
+                id="revolveCard2"
+                role="button"
+                tabindex="0"
+                aria-label="More Projects and Custom Client Builds — Click to view details"
+              >
+                <!-- Top Playing Card Corner Index -->
+                <div class="card-corner-top">
+                  <div class="card-rank-suit" style="color:var(--accent-volt);">
+                    <span>★</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/>
+                    </svg>
+                  </div>
+                  <span class="card-class-tag" style="border-color:rgba(212,255,0,0.4); color:var(--accent-volt);">
+                    GROWING DECK
+                  </span>
+                </div>
+
+                <!-- Center Medallion & Project Brief -->
+                <div class="card-center-art">
+                  <div class="card-medallion" style="border-color:var(--accent-volt); color:var(--accent-volt);">
+                    <i data-lucide="plus-circle" style="width:38px; height:38px;"></i>
+                  </div>
+
+                  <h3 class="card-project-name">More &amp; Client Builds</h3>
+                  <div class="card-project-sub">Custom Projects by Trivioner</div>
+
+                  <div class="card-lore-box">
+                    More of my projects will keep being added to this card deck as I build them. I also engineer custom full-stack websites, Telegram bots, and scalable systems for clients.
+                  </div>
+
+                  <div class="card-stat-pills">
+                    <span class="card-pill">Client Projects</span>
+                    <span class="card-pill">Full-Stack Web</span>
+                    <span class="card-pill">Custom Bots</span>
+                    <span class="card-pill">More Coming</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
+                <div class="card-corner-bottom">
+                  <span class="card-open-label">
+                    <span>Tap to Open Card</span>
+                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                  </span>
+                  <div class="card-rank-inverted" style="color:var(--accent-volt);">
+                    <span>★</span>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
+                      <path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/>
+                    </svg>
+                  </div>
+                </div>
+              </article>
+
+            </div>
+          </div>
+
+          <!-- 3 Indicator Dots -->
+          <div class="carousel-dots">
+            <button type="button" class="dot-btn active" data-goto="0" aria-label="Date Anyone Robot Card"></button>
+            <button type="button" class="dot-btn" data-goto="1" aria-label="Command Hub Card"></button>
+            <button type="button" class="dot-btn" data-goto="2" aria-label="More Projects and Client Work Card"></button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- =================================================================
+           03 // WHAT I BUILD & MASTER (REAL PROOF OF COMPLEX SCALE)
+           ================================================================= -->
+      <section id="capabilities" class="section-block">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="sec-index">02 // SKILLS &amp; ENGINEERING</div>
+              <h2 class="sec-title">What I Build &amp; Master</h2>
+            </div>
+            <p style="font-size:0.94rem; color:var(--text-secondary); max-width:500px;">
+              I build complex, production-ready web platforms and bot architectures designed to handle thousands of real users smoothly.
+            </p>
+          </div>
+
+          <div class="bento-grid">
+            <!-- Skill 1 -->
+            <div class="bento-card">
+              <div>
+                <div class="vector-box">
+                  <i data-lucide="layout" style="width:24px; height:24px;"></i>
+                </div>
+                <h3 class="bento-title">Full-Stack Websites</h3>
+                <p class="bento-body">
+                  Complete web platforms built from scratch—responsive frontend interfaces for mobile, tablet, and laptop, plus backend server APIs and databases.
+                </p>
+              </div>
+              <div class="chip-list">
+                <span class="chip">Frontend UI</span>
+                <span class="chip">Backend APIs</span>
+                <span class="chip">Databases</span>
+              </div>
+            </div>
+
+            <!-- Skill 2 -->
+            <div class="bento-card">
+              <div>
+                <div class="vector-box" style="color:var(--accent-cobalt);">
+                  <i data-lucide="bot" style="width:24px; height:24px;"></i>
+                </div>
+                <h3 class="bento-title">Telegram Bots &amp; Mini Apps</h3>
+                <p class="bento-body">
+                  Feature-packed Telegram bots and custom Mini Web Apps with matchmaking engines, group moderation, Adscram AI video ad rewards, and Telegram Stars payments.
+                </p>
+              </div>
+              <div class="chip-list">
+                <span class="chip">Bot Systems</span>
+                <span class="chip">Mini WebApps</span>
+                <span class="chip">TG Stars</span>
+              </div>
+            </div>
+
+            <!-- Skill 3 -->
+            <div class="bento-card">
+              <div>
+                <div class="vector-box" style="color:var(--accent-crimson);">
+                  <i data-lucide="scan-eye" style="width:24px; height:24px;"></i>
+                </div>
+                <h3 class="bento-title">AI Moderation &amp; Smart Filters</h3>
+                <p class="bento-body">
+                  Integrating dedicated AI servers into live products—such as running two separate AI vision engines to automatically detect and block bad images, plus smart spam detection.
+                </p>
+              </div>
+              <div class="chip-list">
+                <span class="chip">2 AI Servers</span>
+                <span class="chip">Image Safety</span>
+                <span class="chip">Auto-Mod</span>
+              </div>
+            </div>
+
+            <!-- Skill 4: Explicitly showcasing his ability to build complex systems that resist thousands of users -->
+            <div class="bento-card">
+              <div>
+                <div class="vector-box" style="color:var(--accent-mint);">
+                  <i data-lucide="shield-check" style="width:24px; height:24px;"></i>
+                </div>
+                <h3 class="bento-title">Built to Handle Thousands of Users</h3>
+                <p class="bento-body">
+                  I engineer highly complex systems that resist heavy load without crashing—proven by my Dating Bot, which serves 7,000+ registered users and was stress-tested to handle 3,000+ live chat users at once.
+                </p>
+              </div>
+              <div class="chip-list">
+                <span class="chip">3,000+ Live Cap</span>
+                <span class="chip">RAM Queues</span>
+                <span class="chip">Encrypted Cloud</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4-Step Engineering Workflow Strip -->
+          <div class="process-strip">
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.08em;">
+              HOW I ENGINEER COMPLEX PROJECTS FROM SCRATCH
+            </div>
+            <div class="process-steps">
+              <div class="process-step">
+                <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--accent-volt);">STEP 01</div>
+                <div style="font-family:var(--font-display); font-weight:700; font-size:0.98rem; color:#fff; margin:0.2rem 0;">Architecture &amp; Idea</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary);">Designing the full data flow, RAM queues, and database structure so the system scales without paid server bloat.</p>
+              </div>
+              <div class="process-step">
+                <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--accent-cobalt);">STEP 02</div>
+                <div style="font-family:var(--font-display); font-weight:700; font-size:0.98rem; color:#fff; margin:0.2rem 0;">Full-Stack &amp; Bot Build</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary);">Building the Telegram bot, companion Mini Web App, and responsive web dashboard end-to-end.</p>
+              </div>
+              <div class="process-step">
+                <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--accent-crimson);">STEP 03</div>
+                <div style="font-family:var(--font-display); font-weight:700; font-size:0.98rem; color:#fff; margin:0.2rem 0;">AI &amp; Security Hardening</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary);">Connecting multi-server AI moderation, Google Firebase, and encrypted media storage on Telegram servers.</p>
+              </div>
+              <div class="process-step">
+                <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--accent-mint);">STEP 04</div>
+                <div style="font-family:var(--font-display); font-weight:700; font-size:0.98rem; color:#fff; margin:0.2rem 0;">Virtual Load Testing</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary);">Simulating thousands of virtual connections and message floods to verify rock-solid stability in production.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- =================================================================
+           04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & CONTACT ME
+           ================================================================= -->
+      <section id="connect" class="section-block" style="border-bottom:none;">
+        <div class="wrap">
+          <div class="connect-box">
+            <div class="connect-grid">
+              
+              <div>
+                <div class="sec-index">03 // GET IN TOUCH &amp; LINKS</div>
+                <h2 class="sec-title" style="margin-bottom:0.85rem;">
+                  Work With <span class="volt-text">Rishabh Singh</span>
+                </h2>
+                <p style="font-size:0.95rem; color:var(--text-secondary); margin-bottom:1.75rem; max-width:520px;">
+                  Known online as <strong style="color:#fff;">Trivioner</strong> and <strong style="color:#fff;">imarop</strong>. Want a custom full-stack website, Telegram bot, or Mini Web App built? Reach out directly on Telegram, follow my updates channel, or check out my GitHub.
+                </p>
+
+                <div style="display:flex; flex-wrap:wrap; gap:0.85rem;">
+                  <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="btn-volt">
+                    <i data-lucide="send" style="width:17px; height:17px;"></i>
+                    <span>Contact Me Directly</span>
+                  </a>
+                  <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+                    <i data-lucide="radio" style="width:16px; height:16px;"></i>
+                    <span>Updates Channel</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Placed at the bottom: Direct Contact, Updates Channel, and GitHub (imarop) -->
+              <div class="directory-stack">
+                <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="channel-card">
+                  <div class="channel-left">
+                    <div class="channel-icon">
+                      <i data-lucide="message-square" style="width:20px; height:20px;"></i>
+                    </div>
+                    <div>
+                      <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Direct Contact (Trivioner)</div>
+                      <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">http://t.me/Trivioner?direct</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-volt);"></i>
+                </a>
+
+                <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="channel-card">
+                  <div class="channel-left">
+                    <div class="channel-icon" style="color:var(--accent-cobalt);">
+                      <i data-lucide="bell" style="width:20px; height:20px;"></i>
+                    </div>
+                    <div>
+                      <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Updates Channel (Latest Bots &amp; Websites)</div>
+                      <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://t.me/Trivioner</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-cobalt);"></i>
+                </a>
+
+                <a href="https://github.com/imarop" target="_blank" rel="noopener noreferrer" class="channel-card">
+                  <div class="channel-left">
+                    <div class="channel-icon" style="color:var(--accent-mint);">
+                      <i data-lucide="github" style="width:20px; height:20px;"></i>
+                    </div>
+                    <div>
+                      <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">GitHub Profile (imarop)</div>
+                      <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://github.com/imarop</div>
+                    </div>
+                  </div>
+                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-mint);"></i>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; border-top:1px solid var(--line); padding-top:1.75rem;">
+        <div>RISHABH SINGH (TRIVIONER / IMAROP) — FULL-STACK &amp; BOT PORTFOLIO</div>
+        <div>INDIA</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- =====================================================================
+       FULLSCREEN ZOOM TAKEOVER 1: DATE ANYONE ROBOT
+       ===================================================================== -->
+  <div id="takeover-datebot" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkDateTitle">
+    <div class="takeover-panel" onclick="event.stopPropagation();">
+      
+      <div class="takeover-header">
+        <div style="display:flex; align-items:center; gap:0.95rem;">
+          <a href="https://ibb.co/8gDgf97W" target="_blank" rel="noopener noreferrer" class="work-logo" style="border-color:var(--accent-crimson);">
+            <img 
+              src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+              alt="Date Anyone Robot Logo" 
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
+          </a>
+          <div>
+            <div class="work-badge badge-crimson">PROJECT CASE STUDY // CARD 01</div>
+            <h3 id="tkDateTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+              Date Anyone Robot (DateanyoneRobot)
+            </h3>
+          </div>
+        </div>
+        <button type="button" id="closeTkDateBtn" class="close-takeover-btn" onclick="closeTakeover('datebot')">
+          <span>Close</span>
+          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
+        </button>
+      </div>
+
+      <div class="work-quote" style="border-left-color:var(--accent-crimson);">
+        “Connect with strangers, one message away. Date with anyone, one heart away.” — Engineered single-handedly by Rishabh Singh (Trivioner)
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-box tk-stagger">
+          <div class="kpi-num">7,000+</div>
+          <div class="kpi-lbl">Registered Bot Users</div>
+        </div>
+        <div class="kpi-box tk-stagger">
+          <div class="kpi-num" style="color:#FF8096;">11,000+</div>
+          <div class="kpi-lbl">Encrypted Photos</div>
+        </div>
+        <div class="kpi-box tk-stagger">
+          <div class="kpi-num" style="color:var(--accent-mint);">3,000+</div>
+          <div class="kpi-lbl">Live Chat Stress-Tested</div>
+        </div>
+        <div class="kpi-box tk-stagger">
+          <div class="kpi-num" style="color:var(--accent-volt);">2 AI Servers</div>
+          <div class="kpi-lbl">Vision Moderation</div>
+        </div>
+      </div>
+
+      <div class="arch-flow tk-stagger">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.08em;">
+          HOW THE DUAL AI SERVER &amp; ENCRYPTED STORAGE PIPELINE WORKS
+        </div>
+        <div class="arch-nodes">
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:#FF8096;">01 // PROFILE MEDIA</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Photo &amp; Video Upload</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">User creates a profile with photos, videos, age, and bio inside the bot.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-volt);">02 // 2 AI ENGINES</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Multi-Server AI Check</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Checked by 2 separate AI engines on different servers (1 primary high-power engine + 1 secondary engine) to block bad/NSFW images.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-mint);">03 // SAFE STORAGE</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Firebase + TG Encryption</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Data is stored on Google Firebase while all 11,000+ photos are stored on Telegram servers with custom encryption.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-cobalt);">04 // MATCH &amp; CHAT</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Tinder Swipe &amp; RAM Queue</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Instant profile matching alerts or zero-latency Omegle anonymous chat in RAM.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-grid">
+        <div class="module-box tk-stagger">
+          <div class="module-tag">01 // TINDER-STYLE DATING &amp; MATCH ENGINE</div>
+          <h4 class="module-title">Browse Profiles, Like, Dislike &amp; Instant Alerts</h4>
+          <p class="module-desc">
+            Users create safe profiles with their picture, video, age, and details. They can browse through profiles just like Tinder—clicking Like notifies the other person immediately, while the Match Engine displays mutual matches so users can connect, chat, send messages, or report rule-breakers.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">02 // OMEGLE-STYLE RAM ANONYMOUS CHAT</div>
+          <h4 class="module-title">In-Memory Queue &amp; In-Chat Matching</h4>
+          <p class="module-desc">
+            Anonymous chat runs directly in RAM link. Even if 100 people are waiting in the queue, clicking chat picks a random stranger immediately just like Omegle. Users can also click “Match” right inside an anonymous chat if both like each other.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">03 // MINI WEB APP, ADSCRAM AI &amp; STARS</div>
+          <h4 class="module-title">Gender Filters, Points Economy &amp; Shop</h4>
+          <p class="module-desc">
+            Both dating and anonymous chat feature Gender-Based Filtering (Girls or Boys) using Bot Points. Points are earned by watching video ads in a custom security-hardened Web App monetized with Adscram AI, referring friends, or converting Telegram Stars into points. Includes an in-bot Shop and profile editor.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">04 // ENGINEERED FOR THOUSANDS OF USERS</div>
+          <h4 class="module-title">Stress-Tested for 3,000+ Concurrent Live Chatters</h4>
+          <p class="module-desc">
+            Single-handedly built and refined over months without spending money on paid servers. Tested extensively with simulated virtual connections sending messages to each other so that even if 3,000 users live chat simultaneously on free-tier infrastructure, the system never cracks.
+          </p>
+        </div>
+      </div>
+
+      <div class="tk-stagger">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
+          OFFICIAL DATE ANYONE ROBOT LINKS &amp; CHANNELS
+        </div>
+        <div class="ext-links-grid">
+          <a href="https://t.me/DateanyoneRobot" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-crimson); background:rgba(255,46,84,0.14);">
+            <span>Launch Date Anyone Robot</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+          <a href="https://t.me/Dateanyonebotproofs" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+            <span>Stars Payment Proofs (Dateanyonebotproofs)</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+          <a href="https://t.me/Datingbot_chat" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+            <span>Community Group (Datingbot_chat)</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+          <a href="https://t.me/Date_anyone_channel" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+            <span>Bot Updates Channel (Date_anyone_channel)</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FULLSCREEN ZOOM TAKEOVER 2: COMMAND HUB
+       ===================================================================== -->
+  <div id="takeover-cmdhub" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkCmdTitle">
+    <div class="takeover-panel" onclick="event.stopPropagation();">
+      
+      <div class="takeover-header">
+        <div style="display:flex; align-items:center; gap:0.95rem;">
+          <a href="https://ibb.co/VptM29PJ" target="_blank" rel="noopener noreferrer" class="work-logo" style="border-color:var(--accent-cobalt);">
+            <img 
+              src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+              alt="Command Hub Logo" 
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
+          </a>
+          <div>
+            <div class="work-badge badge-cobalt">PROJECT CASE STUDY // CARD 02</div>
+            <h3 id="tkCmdTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+              COMMAND HUB (CommandHUBRoBOT)
+            </h3>
+          </div>
+        </div>
+        <button type="button" id="closeTkCmdBtn" class="close-takeover-btn" onclick="closeTakeover('cmdhub')">
+          <span>Close</span>
+          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
+        </button>
+      </div>
+
+      <div class="work-quote" style="border-left-color:var(--accent-cobalt);">
+        “COMMAND HUB — MODERATE. MANAGE. ENTERTAIN.” — Engineered by Rishabh Singh (Trivioner)
+      </div>
+
+      <div class="arch-flow tk-stagger">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-cobalt); text-transform:uppercase; letter-spacing:0.08em;">
+          HOW COMMAND HUB PROTECTS &amp; ENTERTAINS TELEGRAM GROUPS
+        </div>
+        <div class="arch-nodes">
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-cobalt);">01 // ACCESS CONTROL</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">CAPTCHA &amp; Timed Locks</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Member verification, join limits, and scheduled group close/open windows.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:#FF8096;">02 // BIO &amp; SPAM SCAN</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Bio-Link Detection</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Automatically catches links in user bios or promo messages, plus anti-flood &amp; word filters.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-volt);">03 // MEDIA RULES</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Sticker Whitelisting</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Whitelist approved stickers only and block unauthorized photos or videos.</p>
+          </div>
+          <div class="arch-node">
+            <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-mint);">04 // GROUP ARCADE</div>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">7+ Built-In Games</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Country, Flag, Logo, Pokémon, Trivia, Word Scramble &amp; Meme commands.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-grid">
+        <div class="module-box tk-stagger">
+          <div class="module-tag">01 // GROUP ACCESS &amp; SCHEDULED CLOSE/OPEN</div>
+          <h4 class="module-title">Companion Website, CAPTCHAs &amp; Timed Locks</h4>
+          <p class="module-desc">
+            Includes a companion website and complete group controller. Set member CAPTCHAs, cap how many people can join, configure automated Welcome/Goodbye messages and Group Rules, and schedule exact times when the group automatically closes (locking chat) and re-opens.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">02 // BIO-LINK &amp; PROMOTION DETECTION</div>
+          <h4 class="module-title">Smart Bio Scanner, Keyword Filters &amp; Blacklists</h4>
+          <p class="module-desc">
+            Automatically detects if someone has a link in their Telegram bio or is trying to promote something in chat. Supports anti-flood limits, custom word filters that auto-delete messages and warn users, and link/invite blacklisting.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">03 // MEDIA PERMISSIONS &amp; ADMIN COMMANDS</div>
+          <h4 class="module-title">Sticker Whitelist, Warn, Kick, Ban &amp; Purge</h4>
+          <p class="module-desc">
+            Whitelist specific stickers so only approved stickers can be sent, stop users from sending photos or videos, and moderate effortlessly with warn, kick, ban, and message deletion from anywhere in the chat.
+          </p>
+        </div>
+
+        <div class="module-box tk-stagger">
+          <div class="module-tag">04 // BUILT-IN MULTIPLAYER GAMES &amp; MEMES</div>
+          <h4 class="module-title">7+ Interactive Group Games</h4>
+          <p class="module-desc">
+            Play Guess the Country, Guess the Flag, Guess the Logo, Guess the Pokémon, start random-question Trivia, play Word Scramble, or pull fresh Memes with a single command.
+          </p>
+        </div>
+      </div>
+
+      <div class="tk-stagger">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
+          OFFICIAL COMMAND HUB LINKS
+        </div>
+        <div class="ext-links-grid">
+          <a href="https://t.me/CommandHUBRoBOT" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-cobalt); background:rgba(59,130,246,0.14);">
+            <span>Launch COMMAND HUB (CommandHUBRoBOT)</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+          <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+            <span>Updates Channel (t.me/Trivioner)</span>
+            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FULLSCREEN ZOOM TAKEOVER 3: MORE PROJECTS & CUSTOM CLIENT BUILDS
+       ===================================================================== -->
+  <div id="takeover-morework" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkMoreTitle">
+    <div class="takeover-panel" onclick="event.stopPropagation();">
+      <div class="takeover-header">
+        <div style="display:flex; align-items:center; gap:0.95rem;">
+          <div class="work-logo" style="border-color:var(--accent-volt); display:flex; align-items:center; justify-content:center; color:var(--accent-volt);">
+            <i data-lucide="plus-circle" style="width:28px; height:28px;"></i>
+          </div>
+          <div>
+            <div class="work-badge badge-volt">EXPANDING DECK // CLIENT &amp; FUTURE PROJECTS</div>
+            <h3 id="tkMoreTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+              More Projects &amp; Custom Client Work
+            </h3>
+          </div>
+        </div>
+        <button type="button" id="closeTkMoreBtn" class="close-takeover-btn" onclick="closeTakeover('morework')">
+          <span>Close</span>
+          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
+        </button>
+      </div>
+
+      <div class="work-quote" style="border-left-color:var(--accent-volt);">
+        “Date Anyone Robot and Command Hub are just two featured examples—more of my projects will continue to be added to this card deck, and I also build custom projects for clients.”
+      </div>
+
+      <div class="module-grid">
+        <div class="module-box tk-stagger">
+          <div class="module-tag">01 // GROWING PROJECT ARCHIVE</div>
+          <h4 class="module-title">More Projects Added Over Time</h4>
+          <p class="module-desc">
+            I have built many full-stack websites, Telegram bots, and automation tools. As I release new systems and document more of my builds, new cards will be added right into this revolving deck.
+          </p>
+        </div>
+        <div class="module-box tk-stagger">
+          <div class="module-tag">02 // CUSTOM CLIENT DEVELOPMENT</div>
+          <h4 class="module-title">Available for Custom Websites, Bots &amp; WebApps</h4>
+          <p class="module-desc">
+            I handle client projects end-to-end—whether you need a full-stack web platform, a custom Telegram bot with Mini Web App integration, AI moderation pipelines, or a scalable database backend.
+          </p>
+        </div>
+      </div>
+
+      <div class="ext-links-grid tk-stagger">
+        <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-volt); background:rgba(212,255,0,0.12);">
+          <span>Discuss a Custom Project (t.me/Trivioner?direct)</span>
+          <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+        </a>
+        <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Follow Latest Releases (t.me/Trivioner)</span>
+          <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       PLAYING-CARD 3D DECK ENGINE, HOLOGRAPHIC TILT & CONSTELLATION CANVAS
+       ===================================================================== -->
+  <script>
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. 3-CARD PLAYING DECK CAROUSEL + MOTION BLUR SPIN + FULLSCREEN ZOOM
+    // -------------------------------------------------------------------------
+    var activeCardIndex = 0;
+    var totalCards = 3;
+    var autoRevolveActive = true;
+    var autoRevolveTimer = null;
+    var revolveRing = document.getElementById('revolveRing');
+    var cards = document.querySelectorAll('.playing-card');
+    var dots = document.querySelectorAll('.dot-btn');
+
+    function updateCarouselPositions(triggerBlurBurst) {
+      if (triggerBlurBurst && revolveRing) {
+        revolveRing.classList.add('revolving-blur-burst');
+        setTimeout(function () {
+          revolveRing.classList.remove('revolving-blur-burst');
+        }, 350);
+      }
+
+      cards.forEach(function (card, idx) {
+        var diff = (idx - activeCardIndex + totalCards) % totalCards;
+        var pos = 0;
+        if (diff === 0) pos = 0;
+        else if (diff === 1) pos = 1;
+        else if (diff === 2) pos = -1;
+        card.setAttribute('data-pos', String(pos));
+      });
+
+      dots.forEach(function (dot, idx) {
+        if (idx === activeCardIndex) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+    }
+
+    function stepCarousel(dir) {
+      activeCardIndex = (activeCardIndex + dir + totalCards) % totalCards;
+      updateCarouselPositions(true);
+    }
+
+    function startAutoRevolve() {
+      clearInterval(autoRevolveTimer);
+      autoRevolveTimer = setInterval(function () {
+        if (autoRevolveActive && !document.querySelector('.takeover-backdrop.is-open')) {
+          stepCarousel(1);
+        }
+      }, 4800);
+    }
+    startAutoRevolve();
+
+    var prevCardBtn = document.getElementById('prevCardBtn');
+    var nextCardBtn = document.getElementById('nextCardBtn');
+    var toggleAutoRevolveBtn = document.getElementById('toggleAutoRevolveBtn');
+    var autoRevolveLabel = document.getElementById('autoRevolveLabel');
+
+    if (prevCardBtn) {
+      prevCardBtn.addEventListener('click', function () {
+        stepCarousel(-1);
+        startAutoRevolve();
+      });
+    }
+    if (nextCardBtn) {
+      nextCardBtn.addEventListener('click', function () {
+        stepCarousel(1);
+        startAutoRevolve();
+      });
+    }
+    if (toggleAutoRevolveBtn) {
+      toggleAutoRevolveBtn.addEventListener('click', function () {
+        autoRevolveActive = !autoRevolveActive;
+        if (autoRevolveLabel) {
+          autoRevolveLabel.textContent = autoRevolveActive ? 'Auto-Cycle: ON' : 'Auto-Cycle: PAUSED';
+        }
+      });
+    }
+
+    dots.forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        var targetIdx = parseInt(dot.getAttribute('data-goto'), 10);
+        if (targetIdx !== activeCardIndex) {
+          activeCardIndex = targetIdx;
+          updateCarouselPositions(true);
+          startAutoRevolve();
+        }
+      });
+    });
+
+    // Touch Swipe on Mobile/Tablet
+    var revolveViewport = document.getElementById('revolveViewport');
+    var touchStartX = 0;
+    if (revolveViewport) {
+      revolveViewport.addEventListener('touchstart', function (e) {
+        if (e.touches && e.touches[0]) {
+          touchStartX = e.touches[0].clientX;
+        }
+      }, { passive: true });
+
+      revolveViewport.addEventListener('touchend', function (e) {
+        if (e.changedTouches && e.changedTouches[0]) {
+          var dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 40) {
+            stepCarousel(dx < 0 ? 1 : -1);
+            startAutoRevolve();
+          }
+        }
+      }, { passive: true });
+    }
+
+    // Holographic Foil Glare Tracking + Click-to-Zoom on Playing Cards
+    cards.forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        card.style.setProperty('--cx', (e.clientX - rect.left) + 'px');
+        card.style.setProperty('--cy', (e.clientY - rect.top) + 'px');
+      });
+
+      card.addEventListener('click', function () {
+        var idx = parseInt(card.getAttribute('data-index'), 10);
+        var targetId = card.getAttribute('data-target');
+        if (idx !== activeCardIndex) {
+          activeCardIndex = idx;
+          updateCarouselPositions(true);
+          setTimeout(function () {
+            zoomCardIntoTakeover(card, targetId);
+          }, 260);
+        } else {
+          zoomCardIntoTakeover(card, targetId);
+        }
+      });
+
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    function zoomCardIntoTakeover(cardEl, targetId) {
+      if (cardEl) {
+        cardEl.classList.add('card-zooming-out');
+      }
+      setTimeout(function () {
+        if (cardEl) cardEl.classList.remove('card-zooming-out');
+        openTakeover(targetId);
+      }, 280);
+    }
+
+    function openTakeover(id) {
+      var modal = document.getElementById('takeover-' + id);
+      var stage = document.getElementById('motionStage');
+      if (!modal) return;
+
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+
+      if (stage) {
+        stage.style.filter = 'blur(16px) brightness(0.45)';
+        stage.style.transform = 'scale(0.95)';
+      }
+
+      var panel = modal.querySelector('.takeover-panel');
+      var staggers = modal.querySelectorAll('.tk-stagger');
+
+      if (window.gsap && panel) {
+        gsap.fromTo(panel,
+          { scale: 0.78, opacity: 0, filter: 'blur(22px)' },
+          { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.52, ease: 'expo.out' }
+        );
+        gsap.fromTo(staggers,
+          { y: 28, opacity: 0, filter: 'blur(10px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.44, stagger: 0.055, delay: 0.1, ease: 'power3.out' }
+        );
+      }
+    }
+
+    function closeTakeover(id) {
+      var modal = document.getElementById('takeover-' + id);
+      var stage = document.getElementById('motionStage');
+      if (!modal) return;
+
+      if (stage) {
+        stage.style.filter = 'blur(0px)';
+        stage.style.transform = 'scale(1)';
+      }
+
+      var panel = modal.querySelector('.takeover-panel');
+      if (window.gsap && panel) {
+        gsap.to(panel, {
+          scale: 0.86,
+          opacity: 0,
+          filter: 'blur(16px)',
+          duration: 0.26,
+          ease: 'power2.in',
+          onComplete: function () {
+            modal.classList.remove('is-open');
+            panel.style.filter = '';
+            panel.style.opacity = '';
+            panel.style.transform = '';
+            document.body.style.overflow = '';
+          }
+        });
+      } else
