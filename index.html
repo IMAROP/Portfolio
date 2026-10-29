@@ -3,32 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="description" content="Official developer portfolio of Rishabh Singh (Trivioner / imarop) — Full-Stack Web Developer & Telegram Bot Systems Architect from India." />
   <title>Rishabh Singh (Trivioner / imarop) — Full-Stack &amp; Bot Systems Portfolio</title>
 
-  <!-- Custom Fonts: Syne (Display), Outfit (Geometric Sans), Space Mono (Technical) -->
+  <!-- Custom Google Fonts (with instant system fallback if offline) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Devicon Tech Stack Vector Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
-
-  <!-- Three.js, GSAP + ScrollTrigger, and Lucide Vector Icons -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       RISHABH SINGH PORTFOLIO — PLAYING-CARD 3D DECK & KINETIC DARK STUDIO
+       100% SELF-CONTAINED PORTFOLIO ENGINE (ZERO EXTERNAL JS/ICON CDNs)
+       Every icon, logo, 3D card animation, and motion blur is baked into this file
+       so nothing ever goes missing on any ISP, mobile carrier, or host.
        ========================================================================== */
     :root {
       --bg-0: #040508;
       --bg-1: #0A0D14;
       --bg-2: #111622;
-      --surface: rgba(16, 20, 31, 0.78);
-      --surface-strong: rgba(20, 25, 39, 0.94);
+      --surface: rgba(16, 20, 31, 0.82);
       --line: rgba(255, 255, 255, 0.09);
       --line-strong: rgba(255, 255, 255, 0.22);
       --text-primary: #F8FAFC;
@@ -38,9 +31,8 @@
       --accent-cobalt: #3B82F6;
       --accent-crimson: #FF2E54;
       --accent-mint: #00F5A0;
-      --accent-violet: #A855F7;
-      --font-display: 'Syne', sans-serif;
-      --font-body: 'Outfit', sans-serif;
+      --font-display: 'Syne', system-ui, -apple-system, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, sans-serif;
       --font-mono: 'Space Mono', monospace;
     }
 
@@ -86,17 +78,23 @@
       display: block;
     }
 
+    svg {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
     /* Subtle Studio Film Grain */
     .noise-overlay {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 35;
-      opacity: 0.032;
+      opacity: 0.03;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* Smooth Constellation & 3D Wireframe Background Canvas */
+    /* Smooth Constellation & Aurora Canvas */
     #ambientCanvas {
       position: fixed;
       inset: 0;
@@ -118,7 +116,6 @@
       pointer-events: none;
       z-index: 120;
       transform: translate(-50%, -50%);
-      transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
       mix-blend-mode: difference;
       display: none;
     }
@@ -128,10 +125,34 @@
       }
     }
 
-    /* Motion Stage for Smooth Velocity Blur */
+    /* Native Kinetic Motion-Blur Entry Animation (Zero external JS library needed) */
+    @keyframes nativeMotionBlurIn {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 34px, 0) scale(0.97);
+        filter: blur(16px);
+      }
+      65% {
+        opacity: 1;
+        filter: blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0px);
+      }
+    }
+
+    .anim-enter {
+      animation: nativeMotionBlurIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .anim-d1 { animation-delay: 0.1s; }
+    .anim-d2 { animation-delay: 0.2s; }
+
     #motionStage {
       will-change: transform, filter;
       transform-origin: center center;
+      transition: filter 0.12s ease-out, transform 0.12s ease-out;
     }
 
     .wrap {
@@ -150,13 +171,13 @@
     }
 
     /* ==========================================================================
-       TOP HEADER & MOBILE DOCK
+       TOP HEADER & MOBILE BOTTOM DOCK
        ========================================================================== */
     .top-header {
       position: sticky;
       top: 0;
       z-index: 30;
-      background: rgba(4, 5, 8, 0.8);
+      background: rgba(4, 5, 8, 0.82);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--line);
@@ -182,8 +203,11 @@
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid var(--line-strong);
-      background: var(--bg-2);
+      background: linear-gradient(135deg, #161F33, #090C14);
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .brand-avatar img {
       width: 100%;
@@ -291,7 +315,7 @@
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid var(--line-strong);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
       width: calc(100% - 1.5rem);
       max-width: 400px;
     }
@@ -306,7 +330,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.15rem;
+      gap: 0.2rem;
       font-family: var(--font-mono);
       font-size: 0.6rem;
       text-transform: uppercase;
@@ -508,10 +532,13 @@
       border-radius: 24px;
       overflow: hidden;
       border: 2px solid var(--accent-volt);
-      background: var(--bg-0);
+      background: linear-gradient(135deg, #161F33, #090C14);
       box-shadow: 0 0 36px rgba(212, 255, 0, 0.22);
       position: relative;
       z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .orbital-card:hover .logo-frame {
@@ -554,7 +581,7 @@
     }
 
     /* ==========================================================================
-       TECH ARSENAL MARQUEE
+       TECH ARSENAL MARQUEE (100% INLINE SVG LOGOS — NEVER FAILS TO LOAD)
        ========================================================================== */
     .tech-ribbon {
       border-top: 1px solid var(--line);
@@ -570,7 +597,7 @@
     .tech-track {
       display: inline-flex;
       align-items: center;
-      gap: 2.25rem;
+      gap: 1.75rem;
       animation: ribbonScroll 26s linear infinite;
       will-change: transform, filter;
     }
@@ -583,23 +610,18 @@
     .tech-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.55rem;
       padding: 0.45rem 1rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--line);
       font-family: var(--font-mono);
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: var(--text-primary);
-    }
-    .tech-pill i {
-      font-size: 1.1rem;
-      color: var(--accent-volt);
     }
 
     /* ==========================================================================
        02 // PLAYING-CARD SHAPED 3D REVOLVING PROJECT DECK
-       (True Vertical Playing Card Proportions 2.5 : 3.5 + Corner Indices + Foil)
        ========================================================================== */
     .section-block {
       padding: 4rem 0;
@@ -674,7 +696,6 @@
       transform: scale(1.06);
     }
 
-    /* 3D Playing Card Stage */
     .playing-deck-viewport {
       position: relative;
       width: 100%;
@@ -696,7 +717,6 @@
 
     .playing-deck-ring {
       position: relative;
-      /* Authentic Playing-Card Vertical Aspect Ratio (~ 2.5 : 3.5) */
       width: 340px;
       height: 495px;
       transform-style: preserve-3d;
@@ -710,7 +730,6 @@
       }
     }
 
-    /* Authentic Board-Game / Playing Card Structure */
     .playing-card {
       position: absolute;
       inset: 0;
@@ -736,7 +755,6 @@
       overflow: hidden;
     }
 
-    /* Ornamental Inner Playing-Card Frame Border */
     .playing-card::before {
       content: '';
       position: absolute;
@@ -748,7 +766,6 @@
       transition: border-color 0.35s ease;
     }
 
-    /* Holographic Foil Sheen on Playing Card */
     .playing-card::after {
       content: '';
       position: absolute;
@@ -767,7 +784,6 @@
       opacity: 1;
     }
 
-    /* Suit Themes */
     .playing-card.suit-hearts[data-pos="0"] {
       border-color: var(--accent-crimson);
       box-shadow: 0 32px 85px -16px rgba(255, 46, 84, 0.35), inset 0 0 30px rgba(255, 46, 84, 0.08);
@@ -792,7 +808,6 @@
       border-color: rgba(212, 255, 0, 0.35);
     }
 
-    /* 3-Card Revolving Fan Positions: Center (0), Right (+1), Left (-1) */
     .playing-card[data-pos="0"] {
       transform: translate3d(0, 0, 120px) rotateY(0deg) rotateZ(0deg) scale(1);
       opacity: 1;
@@ -824,7 +839,6 @@
       }
     }
 
-    /* Motion Blur Burst when Revolving & Zooming */
     .revolving-blur-burst .playing-card {
       filter: url(#svgHorizontalBlur) blur(7px) !important;
     }
@@ -836,7 +850,6 @@
       transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    /* Playing Card Corner Indices (Top-Left & Inverted Bottom-Right) */
     .card-corner-top {
       display: flex;
       align-items: center;
@@ -873,7 +886,6 @@
       color: #E2E8F0;
     }
 
-    /* Playing Card Center Emblem / Artwork Medallion */
     .card-center-art {
       position: relative;
       z-index: 3;
@@ -890,7 +902,7 @@
       border-radius: 22px;
       overflow: hidden;
       border: 2px solid var(--line-strong);
-      background: var(--bg-0);
+      background: linear-gradient(135deg, #1B2234, #080A10);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
       margin-bottom: 0.85rem;
       display: flex;
@@ -956,7 +968,6 @@
       color: #E2E8F0;
     }
 
-    /* Playing Card Bottom Bar + Inverted Corner Rank */
     .card-corner-bottom {
       display: flex;
       align-items: center;
@@ -990,7 +1001,6 @@
       opacity: 0.85;
     }
 
-    /* Carousel Dots */
     .carousel-dots {
       display: flex;
       align-items: center;
@@ -1095,7 +1105,6 @@
       color: #CBD5E1;
     }
 
-    /* Engineering Process Timeline Strip */
     .process-strip {
       margin-top: 2.25rem;
       background: rgba(10, 13, 20, 0.85);
@@ -1207,7 +1216,7 @@
     }
 
     /* ==========================================================================
-       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL
+       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL (NATIVE CSS MOTION-BLUR ANIMATION)
        ========================================================================== */
     .takeover-backdrop {
       position: fixed;
@@ -1232,6 +1241,23 @@
       display: flex;
     }
 
+    @keyframes modalZoomBlurIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translate3d(0, 30px, 0);
+        filter: blur(22px);
+      }
+      70% {
+        opacity: 1;
+        filter: blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translate3d(0, 0, 0);
+        filter: blur(0px);
+      }
+    }
+
     .takeover-panel {
       width: 100%;
       height: 100vh;
@@ -1241,7 +1267,7 @@
       border: 1px solid var(--line-strong);
       padding: 1.5rem 1.25rem 3.5rem;
       box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95);
-      will-change: transform, filter, opacity;
+      animation: modalZoomBlurIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     @media (min-width: 768px) {
@@ -1297,6 +1323,9 @@
       border: 1.5px solid var(--line-strong);
       background: var(--bg-0);
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .work-logo img {
       width: 100%;
@@ -1506,7 +1535,7 @@
 </head>
 <body>
 
-  <!-- HIDDEN SVG MOTION BLUR FILTERS (Silently powers smooth directional blur without showing debug text) -->
+  <!-- INLINE SVG MOTION BLUR FILTERS -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none;">
     <defs>
       <filter id="svgVerticalBlur" x="-20%" y="-20%" width="140%" height="140%">
@@ -1527,7 +1556,7 @@
   <!-- Custom Desktop Cursor Ring -->
   <div id="cursorRing" class="cursor-ring"></div>
 
-  <!-- Smooth Glowing Constellation + Aurora Orbs Canvas (Replaces square blue dots) -->
+  <!-- Smooth Glowing Constellation + Aurora Orbs Canvas -->
   <canvas id="ambientCanvas"></canvas>
 
   <!-- TOP MINIMAL HEADER -->
@@ -1562,22 +1591,22 @@
     </div>
   </header>
 
-  <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK -->
+  <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK (WITH INLINE SVGs) -->
   <nav class="mobile-bottom-dock" aria-label="Mobile Navigation">
     <a href="#intro" class="dock-link">
-      <i data-lucide="user" style="width:16px; height:16px;"></i>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>About</span>
     </a>
     <a href="#work" class="dock-link">
-      <i data-lucide="layers" style="width:16px; height:16px;"></i>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
       <span>Projects</span>
     </a>
     <a href="#capabilities" class="dock-link">
-      <i data-lucide="cpu" style="width:16px; height:16px;"></i>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
       <span>Skills</span>
     </a>
     <a href="#connect" class="dock-link">
-      <i data-lucide="send" style="width:16px; height:16px;"></i>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       <span>Contact</span>
     </a>
   </nav>
@@ -1592,9 +1621,9 @@
       <section id="intro" class="hero-section">
         <div class="wrap hero-grid">
           
-          <div class="gs-hero">
+          <div class="anim-enter">
             <div class="eyebrow-chip">
-              <i data-lucide="terminal" style="width:14px; height:14px; color:var(--accent-volt);"></i>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
               <span>18 Y/O FULL-STACK &amp; BOT DEVELOPER // INDIA</span>
             </div>
 
@@ -1622,17 +1651,17 @@
             <div style="display:flex; flex-wrap:wrap; gap:0.85rem; align-items:center;">
               <a href="#work" class="btn-volt">
                 <span>See the Projects I Built</span>
-                <i data-lucide="arrow-down-right" style="width:18px; height:18px;"></i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
               </a>
               <a href="#capabilities" class="btn-ghost">
-                <i data-lucide="layers" style="width:16px; height:16px;"></i>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                 <span>What I Build &amp; Master</span>
               </a>
             </div>
           </div>
 
           <!-- Right Orbital Identity Showcase -->
-          <div class="gs-hero">
+          <div class="anim-enter anim-d1">
             <div class="orbital-card">
               <div class="orbital-stage">
                 <svg class="orbital-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1642,16 +1671,16 @@
                   <circle cx="176" cy="100" r="4" fill="#3B82F6" />
                 </svg>
 
-                <a href="https://ibb.co/LdrMF1b6" target="_blank" rel="noopener noreferrer" class="logo-frame" title="Rishabh Singh Official Logo">
+                <div class="logo-frame" title="Rishabh Singh Official Logo">
                   <img 
                     src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
                     alt="Rishabh Singh Official Logo" 
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                   />
-                  <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:2rem; color:var(--accent-volt);">
+                  <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:2.1rem; color:var(--accent-volt);">
                     RS
                   </div>
-                </a>
+                </div>
               </div>
 
               <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.1em;">
@@ -1684,32 +1713,63 @@
         </div>
       </section>
 
-      <!-- TECH STACK RIBBON -->
+      <!-- TECH STACK RIBBON (100% INLINE SVG ICONS SO THEY NEVER GO MISSING) -->
       <div class="tech-ribbon" aria-hidden="true">
         <div class="tech-track" id="techTrack">
-          <span class="tech-pill"><i class="devicon-javascript-plain"></i><span>JavaScript / ES6+</span></span>
-          <span class="tech-pill"><i class="devicon-nodejs-plain"></i><span>Node.js &amp; Backend APIs</span></span>
-          <span class="tech-pill"><i class="devicon-python-plain"></i><span>Python &amp; Bot Engines</span></span>
-          <span class="tech-pill"><i class="devicon-firebase-plain"></i><span>Google Firebase Realtime</span></span>
-          <span class="tech-pill"><i class="devicon-html5-plain"></i><span>HTML5 &amp; Mini WebApps</span></span>
-          <span class="tech-pill"><i class="devicon-css3-plain"></i><span>Modern CSS3 &amp; 3D UI</span></span>
-          <span class="tech-pill"><i class="devicon-linux-plain"></i><span>Multi-Server Architecture</span></span>
-          <span class="tech-pill"><i class="devicon-git-plain"></i><span>Git &amp; Security</span></span>
-          <!-- Seamless loop duplicate -->
-          <span class="tech-pill"><i class="devicon-javascript-plain"></i><span>JavaScript / ES6+</span></span>
-          <span class="tech-pill"><i class="devicon-nodejs-plain"></i><span>Node.js &amp; Backend APIs</span></span>
-          <span class="tech-pill"><i class="devicon-python-plain"></i><span>Python &amp; Bot Engines</span></span>
-          <span class="tech-pill"><i class="devicon-firebase-plain"></i><span>Google Firebase Realtime</span></span>
-          <span class="tech-pill"><i class="devicon-html5-plain"></i><span>HTML5 &amp; Mini WebApps</span></span>
-          <span class="tech-pill"><i class="devicon-css3-plain"></i><span>Modern CSS3 &amp; 3D UI</span></span>
-          <span class="tech-pill"><i class="devicon-linux-plain"></i><span>Multi-Server Architecture</span></span>
-          <span class="tech-pill"><i class="devicon-git-plain"></i><span>Git &amp; Security</span></span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>JavaScript / ES6+</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            <span>Node.js &amp; Backend APIs</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span>Python &amp; Bot Engines</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2E54" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            <span>Google Firebase Realtime</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>HTML5 &amp; Mini WebApps</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Encrypted Cloud Storage</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Multi-Server AI Pipelines</span>
+          </span>
+          <!-- Duplicate for seamless loop -->
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>JavaScript / ES6+</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            <span>Node.js &amp; Backend APIs</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <span>Python &amp; Bot Engines</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2E54" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            <span>Google Firebase Realtime</span>
+          </span>
+          <span class="tech-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>HTML5 &amp; Mini WebApps</span>
+          </span>
         </div>
       </div>
 
       <!-- =================================================================
            02 // PROJECTS I BUILT — PLAYING-CARD SHAPED REVOLVING 3-CARD DECK
-           (Card 1: Date Anyone Robot, Card 2: Command Hub, Card 3: More & Client Builds)
            ================================================================= -->
       <section id="work" class="section-block">
         <div class="wrap">
@@ -1727,13 +1787,13 @@
           <div class="deck-controls-bar">
             <div style="display:flex; align-items:center; gap:0.65rem;">
               <button type="button" id="prevCardBtn" class="revolve-btn" aria-label="Previous Project Card">
-                <i data-lucide="chevron-left" style="width:20px; height:20px;"></i>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
               <button type="button" id="nextCardBtn" class="revolve-btn" aria-label="Next Project Card">
-                <i data-lucide="chevron-right" style="width:20px; height:20px;"></i>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
               <button type="button" id="toggleAutoRevolveBtn" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
-                <i data-lucide="refresh-cw" style="width:14px; height:14px;"></i>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                 <span id="autoRevolveLabel">Auto-Cycle: ON</span>
               </button>
             </div>
@@ -1760,7 +1820,6 @@
                 tabindex="0"
                 aria-label="Date Anyone Robot — Click to view full project details"
               >
-                <!-- Top Playing Card Corner Index -->
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-crimson);">
                     <span>A</span>
@@ -1773,7 +1832,6 @@
                   </span>
                 </div>
 
-                <!-- Center Medallion & Project Brief -->
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-crimson);">
                     <img 
@@ -1781,29 +1839,28 @@
                       alt="Date Anyone Robot Logo" 
                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                     />
-                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:1.5rem; color:var(--accent-crimson);">DA</div>
                   </div>
 
                   <h3 class="card-project-name">Date Anyone Robot</h3>
                   <div class="card-project-sub">t.me/DateanyoneRobot</div>
 
                   <div class="card-lore-box">
-                    Dating &amp; anonymous chat bot with <strong style="color:#fff;">7,000+ users</strong> &amp; <strong style="color:#fff;">11,000+ encrypted photos</strong>. Tinder-style matching, RAM anonymous chat, 2 AI moderation servers &amp; Mini Web App.
+                    Social discovery &amp; real-time chat bot with <strong style="color:#fff;">7,000+ users</strong> &amp; <strong style="color:#fff;">11,000+ encrypted photos</strong>. Profile matching engine, RAM chat queue, 2 AI moderation servers &amp; Mini Web App.
                   </div>
 
                   <div class="card-stat-pills">
                     <span class="card-pill">2 AI Servers</span>
-                    <span class="card-pill">RAM Chat</span>
+                    <span class="card-pill">RAM Queue</span>
                     <span class="card-pill">Firebase + TG Cloud</span>
                     <span class="card-pill">3,000 Live Cap</span>
                   </div>
                 </div>
 
-                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
                 <div class="card-corner-bottom">
                   <span class="card-open-label" style="color:#FF8096;">
                     <span>Tap to Open Card</span>
-                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                   </span>
                   <div class="card-rank-inverted" style="color:var(--accent-crimson);">
                     <span>A</span>
@@ -1827,7 +1884,6 @@
                 tabindex="0"
                 aria-label="Command Hub — Click to view full project details"
               >
-                <!-- Top Playing Card Corner Index -->
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-cobalt);">
                     <span>K</span>
@@ -1840,7 +1896,6 @@
                   </span>
                 </div>
 
-                <!-- Center Medallion & Project Brief -->
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-cobalt);">
                     <img 
@@ -1848,14 +1903,14 @@
                       alt="Command Hub Logo" 
                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                     />
-                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:1.5rem; color:var(--accent-cobalt);">CH</div>
                   </div>
 
                   <h3 class="card-project-name">COMMAND HUB</h3>
                   <div class="card-project-sub">t.me/CommandHUBRoBOT</div>
 
                   <div class="card-lore-box">
-                    Moderate, manage &amp; entertain Telegram groups. Features web settings, CAPTCHA, scheduled group close/open locks, bio-link &amp; promo detection, sticker whitelist &amp; 7+ games.
+                    Moderate, manage &amp; entertain Telegram groups. Features web settings, CAPTCHA, scheduled group close/open locks, bio-link scanner, sticker whitelist &amp; 7+ games.
                   </div>
 
                   <div class="card-stat-pills">
@@ -1866,11 +1921,10 @@
                   </div>
                 </div>
 
-                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
                 <div class="card-corner-bottom">
                   <span class="card-open-label" style="color:#93C5FD;">
                     <span>Tap to Open Card</span>
-                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                   </span>
                   <div class="card-rank-inverted" style="color:var(--accent-cobalt);">
                     <span>K</span>
@@ -1882,7 +1936,7 @@
               </article>
 
               <!-- =========================================================
-                   PLAYING CARD 3 (JOKER / WILD CARD): MORE PROJECTS & CLIENT WORK
+                   PLAYING CARD 3 (WILD STAR): MORE PROJECTS & CLIENT WORK
                    ========================================================= -->
               <article 
                 class="playing-card suit-joker" 
@@ -1894,7 +1948,6 @@
                 tabindex="0"
                 aria-label="More Projects and Custom Client Builds — Click to view details"
               >
-                <!-- Top Playing Card Corner Index -->
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-volt);">
                     <span>★</span>
@@ -1907,10 +1960,9 @@
                   </span>
                 </div>
 
-                <!-- Center Medallion & Project Brief -->
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-volt); color:var(--accent-volt);">
-                    <i data-lucide="plus-circle" style="width:38px; height:38px;"></i>
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                   </div>
 
                   <h3 class="card-project-name">More &amp; Client Builds</h3>
@@ -1928,11 +1980,10 @@
                   </div>
                 </div>
 
-                <!-- Bottom Playing Card Bar & Inverted Corner Index -->
                 <div class="card-corner-bottom">
                   <span class="card-open-label">
                     <span>Tap to Open Card</span>
-                    <i data-lucide="arrow-up-right" style="width:14px; height:14px;"></i>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                   </span>
                   <div class="card-rank-inverted" style="color:var(--accent-volt);">
                     <span>★</span>
@@ -1957,7 +2008,7 @@
       </section>
 
       <!-- =================================================================
-           03 // WHAT I BUILD & MASTER (REAL PROOF OF COMPLEX SCALE)
+           03 // WHAT I BUILD & MASTER (100% INLINE SVG ICONS)
            ================================================================= -->
       <section id="capabilities" class="section-block">
         <div class="wrap">
@@ -1976,7 +2027,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box">
-                  <i data-lucide="layout" style="width:24px; height:24px;"></i>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                 </div>
                 <h3 class="bento-title">Full-Stack Websites</h3>
                 <p class="bento-body">
@@ -1994,11 +2045,11 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-cobalt);">
-                  <i data-lucide="bot" style="width:24px; height:24px;"></i>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
                 </div>
                 <h3 class="bento-title">Telegram Bots &amp; Mini Apps</h3>
                 <p class="bento-body">
-                  Feature-packed Telegram bots and custom Mini Web Apps with matchmaking engines, group moderation, Adscram AI video ad rewards, and Telegram Stars payments.
+                  Feature-packed Telegram bots and custom Mini Web Apps with matchmaking engines, group moderation, in-app reward systems, and Telegram Stars integration.
                 </p>
               </div>
               <div class="chip-list">
@@ -2012,7 +2063,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-crimson);">
-                  <i data-lucide="scan-eye" style="width:24px; height:24px;"></i>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
                 <h3 class="bento-title">AI Moderation &amp; Smart Filters</h3>
                 <p class="bento-body">
@@ -2026,15 +2077,15 @@
               </div>
             </div>
 
-            <!-- Skill 4: Explicitly showcasing his ability to build complex systems that resist thousands of users -->
+            <!-- Skill 4 -->
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-mint);">
-                  <i data-lucide="shield-check" style="width:24px; height:24px;"></i>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 </div>
                 <h3 class="bento-title">Built to Handle Thousands of Users</h3>
                 <p class="bento-body">
-                  I engineer highly complex systems that resist heavy load without crashing—proven by my Dating Bot, which serves 7,000+ registered users and was stress-tested to handle 3,000+ live chat users at once.
+                  I engineer highly complex systems that resist heavy load without crashing—proven by my social discovery bot serving 7,000+ registered users and stress-tested for 3,000+ live chat users at once.
                 </p>
               </div>
               <div class="chip-list">
@@ -2079,6 +2130,7 @@
 
       <!-- =================================================================
            04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & CONTACT ME
+           (100% INLINE SVG LOGOS SO GITHUB & TELEGRAM ICONS ALWAYS RENDER)
            ================================================================= -->
       <section id="connect" class="section-block" style="border-bottom:none;">
         <div class="wrap">
@@ -2095,56 +2147,56 @@
                 </p>
 
                 <div style="display:flex; flex-wrap:wrap; gap:0.85rem;">
-                  <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="btn-volt">
-                    <i data-lucide="send" style="width:17px; height:17px;"></i>
-                    <span>Contact Me Directly</span>
+                  <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="btn-volt">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <span>Contact Me on Telegram</span>
                   </a>
-                  <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="btn-ghost">
-                    <i data-lucide="radio" style="width:16px; height:16px;"></i>
-                    <span>Updates Channel</span>
+                  <a href="https://github.com/imarop" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                    <span>GitHub (imarop)</span>
                   </a>
                 </div>
               </div>
 
-              <!-- Placed at the bottom: Direct Contact, Updates Channel, and GitHub (imarop) -->
+              <!-- Placed at the bottom with 100% inline SVG icons -->
               <div class="directory-stack">
-                <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="channel-card">
+                <a href="https://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
                     <div class="channel-icon">
-                      <i data-lucide="message-square" style="width:20px; height:20px;"></i>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
                     <div>
                       <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Direct Contact (Trivioner)</div>
-                      <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">http://t.me/Trivioner?direct</div>
+                      <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://t.me/Trivioner?direct</div>
                     </div>
                   </div>
-                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-volt);"></i>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
 
                 <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
                     <div class="channel-icon" style="color:var(--accent-cobalt);">
-                      <i data-lucide="bell" style="width:20px; height:20px;"></i>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     </div>
                     <div>
                       <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Updates Channel (Latest Bots &amp; Websites)</div>
                       <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://t.me/Trivioner</div>
                     </div>
                   </div>
-                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-cobalt);"></i>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
 
                 <a href="https://github.com/imarop" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
                     <div class="channel-icon" style="color:var(--accent-mint);">
-                      <i data-lucide="github" style="width:20px; height:20px;"></i>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
                     </div>
                     <div>
                       <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">GitHub Profile (imarop)</div>
                       <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://github.com/imarop</div>
                     </div>
                   </div>
-                  <i data-lucide="arrow-up-right" style="width:18px; height:18px; color:var(--accent-mint);"></i>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
               </div>
 
@@ -2171,14 +2223,14 @@
       
       <div class="takeover-header">
         <div style="display:flex; align-items:center; gap:0.95rem;">
-          <a href="https://ibb.co/8gDgf97W" target="_blank" rel="noopener noreferrer" class="work-logo" style="border-color:var(--accent-crimson);">
+          <div class="work-logo" style="border-color:var(--accent-crimson);">
             <img 
               src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
               alt="Date Anyone Robot Logo" 
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
             />
             <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
-          </a>
+          </div>
           <div>
             <div class="work-badge badge-crimson">PROJECT CASE STUDY // CARD 01</div>
             <h3 id="tkDateTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
@@ -2188,7 +2240,7 @@
         </div>
         <button type="button" id="closeTkDateBtn" class="close-takeover-btn" onclick="closeTakeover('datebot')">
           <span>Close</span>
-          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -2197,25 +2249,25 @@
       </div>
 
       <div class="kpi-grid">
-        <div class="kpi-box tk-stagger">
+        <div class="kpi-box">
           <div class="kpi-num">7,000+</div>
           <div class="kpi-lbl">Registered Bot Users</div>
         </div>
-        <div class="kpi-box tk-stagger">
+        <div class="kpi-box">
           <div class="kpi-num" style="color:#FF8096;">11,000+</div>
           <div class="kpi-lbl">Encrypted Photos</div>
         </div>
-        <div class="kpi-box tk-stagger">
+        <div class="kpi-box">
           <div class="kpi-num" style="color:var(--accent-mint);">3,000+</div>
           <div class="kpi-lbl">Live Chat Stress-Tested</div>
         </div>
-        <div class="kpi-box tk-stagger">
+        <div class="kpi-box">
           <div class="kpi-num" style="color:var(--accent-volt);">2 AI Servers</div>
           <div class="kpi-lbl">Vision Moderation</div>
         </div>
       </div>
 
-      <div class="arch-flow tk-stagger">
+      <div class="arch-flow">
         <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.08em;">
           HOW THE DUAL AI SERVER &amp; ENCRYPTED STORAGE PIPELINE WORKS
         </div>
@@ -2228,7 +2280,7 @@
           <div class="arch-node">
             <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-volt);">02 // 2 AI ENGINES</div>
             <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Multi-Server AI Check</div>
-            <p style="font-size:0.78rem; color:var(--text-secondary);">Checked by 2 separate AI engines on different servers (1 primary high-power engine + 1 secondary engine) to block bad/NSFW images.</p>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Checked by 2 separate AI engines on different servers (1 primary high-power engine + 1 secondary engine) to keep profile media clean and safe.</p>
           </div>
           <div class="arch-node">
             <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-mint);">03 // SAFE STORAGE</div>
@@ -2237,66 +2289,66 @@
           </div>
           <div class="arch-node">
             <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent-cobalt);">04 // MATCH &amp; CHAT</div>
-            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Tinder Swipe &amp; RAM Queue</div>
-            <p style="font-size:0.78rem; color:var(--text-secondary);">Instant profile matching alerts or zero-latency Omegle anonymous chat in RAM.</p>
+            <div style="font-family:var(--font-display); font-weight:700; font-size:0.92rem; color:#fff; margin:0.25rem 0;">Discovery &amp; RAM Queue</div>
+            <p style="font-size:0.78rem; color:var(--text-secondary);">Instant profile matching alerts or zero-latency random pairing in RAM.</p>
           </div>
         </div>
       </div>
 
       <div class="module-grid">
-        <div class="module-box tk-stagger">
-          <div class="module-tag">01 // TINDER-STYLE DATING &amp; MATCH ENGINE</div>
+        <div class="module-box">
+          <div class="module-tag">01 // SOCIAL DISCOVERY &amp; MATCH ENGINE</div>
           <h4 class="module-title">Browse Profiles, Like, Dislike &amp; Instant Alerts</h4>
           <p class="module-desc">
-            Users create safe profiles with their picture, video, age, and details. They can browse through profiles just like Tinder—clicking Like notifies the other person immediately, while the Match Engine displays mutual matches so users can connect, chat, send messages, or report rule-breakers.
+            Users create safe profiles with their picture, video, age, and details. They can browse through profiles—clicking Like notifies the other person immediately, while the Match Engine displays mutual matches so users can connect, chat, send messages, or report profiles.
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
-          <div class="module-tag">02 // OMEGLE-STYLE RAM ANONYMOUS CHAT</div>
+        <div class="module-box">
+          <div class="module-tag">02 // RAM-LINKED RANDOM CHAT QUEUE</div>
           <h4 class="module-title">In-Memory Queue &amp; In-Chat Matching</h4>
           <p class="module-desc">
-            Anonymous chat runs directly in RAM link. Even if 100 people are waiting in the queue, clicking chat picks a random stranger immediately just like Omegle. Users can also click “Match” right inside an anonymous chat if both like each other.
+            Random 1-on-1 chat runs directly in RAM link. Even if 100 people are waiting in the queue, clicking chat pairs two users immediately. Users can also click “Match” right inside a conversation if both want to connect.
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
-          <div class="module-tag">03 // MINI WEB APP, ADSCRAM AI &amp; STARS</div>
-          <h4 class="module-title">Gender Filters, Points Economy &amp; Shop</h4>
+        <div class="module-box">
+          <div class="module-tag">03 // MINI WEB APP &amp; POINTS ECONOMY</div>
+          <h4 class="module-title">Custom Filters, Points System &amp; Shop</h4>
           <p class="module-desc">
-            Both dating and anonymous chat feature Gender-Based Filtering (Girls or Boys) using Bot Points. Points are earned by watching video ads in a custom security-hardened Web App monetized with Adscram AI, referring friends, or converting Telegram Stars into points. Includes an in-bot Shop and profile editor.
+            Both discovery and live chat feature preference filtering powered by Bot Points. Points are earned via a custom security-hardened Mini Web App integrated with Adscram AI, user referrals, or Telegram Stars conversion, alongside an in-bot Shop.
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
+        <div class="module-box">
           <div class="module-tag">04 // ENGINEERED FOR THOUSANDS OF USERS</div>
           <h4 class="module-title">Stress-Tested for 3,000+ Concurrent Live Chatters</h4>
           <p class="module-desc">
-            Single-handedly built and refined over months without spending money on paid servers. Tested extensively with simulated virtual connections sending messages to each other so that even if 3,000 users live chat simultaneously on free-tier infrastructure, the system never cracks.
+            Single-handedly built and refined over months without spending money on paid servers. Tested extensively with simulated virtual connections sending concurrent messages so that even if 3,000 users live chat simultaneously on free-tier infrastructure, the system stays rock-solid.
           </p>
         </div>
       </div>
 
-      <div class="tk-stagger">
+      <div>
         <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
-          OFFICIAL DATE ANYONE ROBOT LINKS &amp; CHANNELS
+          OFFICIAL PROJECT LINKS &amp; CHANNELS
         </div>
         <div class="ext-links-grid">
           <a href="https://t.me/DateanyoneRobot" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-crimson); background:rgba(255,46,84,0.14);">
-            <span>Launch Date Anyone Robot</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <span>Launch Bot (DateanyoneRobot)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
           <a href="https://t.me/Dateanyonebotproofs" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-            <span>Stars Payment Proofs (Dateanyonebotproofs)</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <span>Verified Stars Channel (Dateanyonebotproofs)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
           <a href="https://t.me/Datingbot_chat" target="_blank" rel="noopener noreferrer" class="ext-link-card">
             <span>Community Group (Datingbot_chat)</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
           <a href="https://t.me/Date_anyone_channel" target="_blank" rel="noopener noreferrer" class="ext-link-card">
             <span>Bot Updates Channel (Date_anyone_channel)</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
         </div>
       </div>
@@ -2312,14 +2364,14 @@
       
       <div class="takeover-header">
         <div style="display:flex; align-items:center; gap:0.95rem;">
-          <a href="https://ibb.co/VptM29PJ" target="_blank" rel="noopener noreferrer" class="work-logo" style="border-color:var(--accent-cobalt);">
+          <div class="work-logo" style="border-color:var(--accent-cobalt);">
             <img 
               src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
               alt="Command Hub Logo" 
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
             />
             <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
-          </a>
+          </div>
           <div>
             <div class="work-badge badge-cobalt">PROJECT CASE STUDY // CARD 02</div>
             <h3 id="tkCmdTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
@@ -2329,7 +2381,7 @@
         </div>
         <button type="button" id="closeTkCmdBtn" class="close-takeover-btn" onclick="closeTakeover('cmdhub')">
           <span>Close</span>
-          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -2337,7 +2389,7 @@
         “COMMAND HUB — MODERATE. MANAGE. ENTERTAIN.” — Engineered by Rishabh Singh (Trivioner)
       </div>
 
-      <div class="arch-flow tk-stagger">
+      <div class="arch-flow">
         <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-cobalt); text-transform:uppercase; letter-spacing:0.08em;">
           HOW COMMAND HUB PROTECTS &amp; ENTERTAINS TELEGRAM GROUPS
         </div>
@@ -2366,7 +2418,7 @@
       </div>
 
       <div class="module-grid">
-        <div class="module-box tk-stagger">
+        <div class="module-box">
           <div class="module-tag">01 // GROUP ACCESS &amp; SCHEDULED CLOSE/OPEN</div>
           <h4 class="module-title">Companion Website, CAPTCHAs &amp; Timed Locks</h4>
           <p class="module-desc">
@@ -2374,7 +2426,7 @@
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
+        <div class="module-box">
           <div class="module-tag">02 // BIO-LINK &amp; PROMOTION DETECTION</div>
           <h4 class="module-title">Smart Bio Scanner, Keyword Filters &amp; Blacklists</h4>
           <p class="module-desc">
@@ -2382,7 +2434,7 @@
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
+        <div class="module-box">
           <div class="module-tag">03 // MEDIA PERMISSIONS &amp; ADMIN COMMANDS</div>
           <h4 class="module-title">Sticker Whitelist, Warn, Kick, Ban &amp; Purge</h4>
           <p class="module-desc">
@@ -2390,7 +2442,7 @@
           </p>
         </div>
 
-        <div class="module-box tk-stagger">
+        <div class="module-box">
           <div class="module-tag">04 // BUILT-IN MULTIPLAYER GAMES &amp; MEMES</div>
           <h4 class="module-title">7+ Interactive Group Games</h4>
           <p class="module-desc">
@@ -2399,18 +2451,18 @@
         </div>
       </div>
 
-      <div class="tk-stagger">
+      <div>
         <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
           OFFICIAL COMMAND HUB LINKS
         </div>
         <div class="ext-links-grid">
           <a href="https://t.me/CommandHUBRoBOT" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-cobalt); background:rgba(59,130,246,0.14);">
             <span>Launch COMMAND HUB (CommandHUBRoBOT)</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
           <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
             <span>Updates Channel (t.me/Trivioner)</span>
-            <i data-lucide="external-link" style="width:15px; height:15px;"></i>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </a>
         </div>
       </div>
@@ -2425,8 +2477,8 @@
     <div class="takeover-panel" onclick="event.stopPropagation();">
       <div class="takeover-header">
         <div style="display:flex; align-items:center; gap:0.95rem;">
-          <div class="work-logo" style="border-color:var(--accent-volt); display:flex; align-items:center; justify-content:center; color:var(--accent-volt);">
-            <i data-lucide="plus-circle" style="width:28px; height:28px;"></i>
+          <div class="work-logo" style="border-color:var(--accent-volt); color:var(--accent-volt);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           </div>
           <div>
             <div class="work-badge badge-volt">EXPANDING DECK // CLIENT &amp; FUTURE PROJECTS</div>
@@ -2437,251 +2489,4 @@
         </div>
         <button type="button" id="closeTkMoreBtn" class="close-takeover-btn" onclick="closeTakeover('morework')">
           <span>Close</span>
-          <i data-lucide="minimize-2" style="width:15px; height:15px;"></i>
-        </button>
-      </div>
-
-      <div class="work-quote" style="border-left-color:var(--accent-volt);">
-        “Date Anyone Robot and Command Hub are just two featured examples—more of my projects will continue to be added to this card deck, and I also build custom projects for clients.”
-      </div>
-
-      <div class="module-grid">
-        <div class="module-box tk-stagger">
-          <div class="module-tag">01 // GROWING PROJECT ARCHIVE</div>
-          <h4 class="module-title">More Projects Added Over Time</h4>
-          <p class="module-desc">
-            I have built many full-stack websites, Telegram bots, and automation tools. As I release new systems and document more of my builds, new cards will be added right into this revolving deck.
-          </p>
-        </div>
-        <div class="module-box tk-stagger">
-          <div class="module-tag">02 // CUSTOM CLIENT DEVELOPMENT</div>
-          <h4 class="module-title">Available for Custom Websites, Bots &amp; WebApps</h4>
-          <p class="module-desc">
-            I handle client projects end-to-end—whether you need a full-stack web platform, a custom Telegram bot with Mini Web App integration, AI moderation pipelines, or a scalable database backend.
-          </p>
-        </div>
-      </div>
-
-      <div class="ext-links-grid tk-stagger">
-        <a href="http://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-volt); background:rgba(212,255,0,0.12);">
-          <span>Discuss a Custom Project (t.me/Trivioner?direct)</span>
-          <i data-lucide="external-link" style="width:15px; height:15px;"></i>
-        </a>
-        <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-          <span>Follow Latest Releases (t.me/Trivioner)</span>
-          <i data-lucide="external-link" style="width:15px; height:15px;"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================================
-       PLAYING-CARD 3D DECK ENGINE, HOLOGRAPHIC TILT & CONSTELLATION CANVAS
-       ===================================================================== -->
-  <script>
-    if (window.lucide) {
-      window.lucide.createIcons();
-    }
-
-    // -------------------------------------------------------------------------
-    // 1. 3-CARD PLAYING DECK CAROUSEL + MOTION BLUR SPIN + FULLSCREEN ZOOM
-    // -------------------------------------------------------------------------
-    var activeCardIndex = 0;
-    var totalCards = 3;
-    var autoRevolveActive = true;
-    var autoRevolveTimer = null;
-    var revolveRing = document.getElementById('revolveRing');
-    var cards = document.querySelectorAll('.playing-card');
-    var dots = document.querySelectorAll('.dot-btn');
-
-    function updateCarouselPositions(triggerBlurBurst) {
-      if (triggerBlurBurst && revolveRing) {
-        revolveRing.classList.add('revolving-blur-burst');
-        setTimeout(function () {
-          revolveRing.classList.remove('revolving-blur-burst');
-        }, 350);
-      }
-
-      cards.forEach(function (card, idx) {
-        var diff = (idx - activeCardIndex + totalCards) % totalCards;
-        var pos = 0;
-        if (diff === 0) pos = 0;
-        else if (diff === 1) pos = 1;
-        else if (diff === 2) pos = -1;
-        card.setAttribute('data-pos', String(pos));
-      });
-
-      dots.forEach(function (dot, idx) {
-        if (idx === activeCardIndex) dot.classList.add('active');
-        else dot.classList.remove('active');
-      });
-    }
-
-    function stepCarousel(dir) {
-      activeCardIndex = (activeCardIndex + dir + totalCards) % totalCards;
-      updateCarouselPositions(true);
-    }
-
-    function startAutoRevolve() {
-      clearInterval(autoRevolveTimer);
-      autoRevolveTimer = setInterval(function () {
-        if (autoRevolveActive && !document.querySelector('.takeover-backdrop.is-open')) {
-          stepCarousel(1);
-        }
-      }, 4800);
-    }
-    startAutoRevolve();
-
-    var prevCardBtn = document.getElementById('prevCardBtn');
-    var nextCardBtn = document.getElementById('nextCardBtn');
-    var toggleAutoRevolveBtn = document.getElementById('toggleAutoRevolveBtn');
-    var autoRevolveLabel = document.getElementById('autoRevolveLabel');
-
-    if (prevCardBtn) {
-      prevCardBtn.addEventListener('click', function () {
-        stepCarousel(-1);
-        startAutoRevolve();
-      });
-    }
-    if (nextCardBtn) {
-      nextCardBtn.addEventListener('click', function () {
-        stepCarousel(1);
-        startAutoRevolve();
-      });
-    }
-    if (toggleAutoRevolveBtn) {
-      toggleAutoRevolveBtn.addEventListener('click', function () {
-        autoRevolveActive = !autoRevolveActive;
-        if (autoRevolveLabel) {
-          autoRevolveLabel.textContent = autoRevolveActive ? 'Auto-Cycle: ON' : 'Auto-Cycle: PAUSED';
-        }
-      });
-    }
-
-    dots.forEach(function (dot) {
-      dot.addEventListener('click', function () {
-        var targetIdx = parseInt(dot.getAttribute('data-goto'), 10);
-        if (targetIdx !== activeCardIndex) {
-          activeCardIndex = targetIdx;
-          updateCarouselPositions(true);
-          startAutoRevolve();
-        }
-      });
-    });
-
-    // Touch Swipe on Mobile/Tablet
-    var revolveViewport = document.getElementById('revolveViewport');
-    var touchStartX = 0;
-    if (revolveViewport) {
-      revolveViewport.addEventListener('touchstart', function (e) {
-        if (e.touches && e.touches[0]) {
-          touchStartX = e.touches[0].clientX;
-        }
-      }, { passive: true });
-
-      revolveViewport.addEventListener('touchend', function (e) {
-        if (e.changedTouches && e.changedTouches[0]) {
-          var dx = e.changedTouches[0].clientX - touchStartX;
-          if (Math.abs(dx) > 40) {
-            stepCarousel(dx < 0 ? 1 : -1);
-            startAutoRevolve();
-          }
-        }
-      }, { passive: true });
-    }
-
-    // Holographic Foil Glare Tracking + Click-to-Zoom on Playing Cards
-    cards.forEach(function (card) {
-      card.addEventListener('mousemove', function (e) {
-        var rect = card.getBoundingClientRect();
-        card.style.setProperty('--cx', (e.clientX - rect.left) + 'px');
-        card.style.setProperty('--cy', (e.clientY - rect.top) + 'px');
-      });
-
-      card.addEventListener('click', function () {
-        var idx = parseInt(card.getAttribute('data-index'), 10);
-        var targetId = card.getAttribute('data-target');
-        if (idx !== activeCardIndex) {
-          activeCardIndex = idx;
-          updateCarouselPositions(true);
-          setTimeout(function () {
-            zoomCardIntoTakeover(card, targetId);
-          }, 260);
-        } else {
-          zoomCardIntoTakeover(card, targetId);
-        }
-      });
-
-      card.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          card.click();
-        }
-      });
-    });
-
-    function zoomCardIntoTakeover(cardEl, targetId) {
-      if (cardEl) {
-        cardEl.classList.add('card-zooming-out');
-      }
-      setTimeout(function () {
-        if (cardEl) cardEl.classList.remove('card-zooming-out');
-        openTakeover(targetId);
-      }, 280);
-    }
-
-    function openTakeover(id) {
-      var modal = document.getElementById('takeover-' + id);
-      var stage = document.getElementById('motionStage');
-      if (!modal) return;
-
-      modal.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-
-      if (stage) {
-        stage.style.filter = 'blur(16px) brightness(0.45)';
-        stage.style.transform = 'scale(0.95)';
-      }
-
-      var panel = modal.querySelector('.takeover-panel');
-      var staggers = modal.querySelectorAll('.tk-stagger');
-
-      if (window.gsap && panel) {
-        gsap.fromTo(panel,
-          { scale: 0.78, opacity: 0, filter: 'blur(22px)' },
-          { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.52, ease: 'expo.out' }
-        );
-        gsap.fromTo(staggers,
-          { y: 28, opacity: 0, filter: 'blur(10px)' },
-          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.44, stagger: 0.055, delay: 0.1, ease: 'power3.out' }
-        );
-      }
-    }
-
-    function closeTakeover(id) {
-      var modal = document.getElementById('takeover-' + id);
-      var stage = document.getElementById('motionStage');
-      if (!modal) return;
-
-      if (stage) {
-        stage.style.filter = 'blur(0px)';
-        stage.style.transform = 'scale(1)';
-      }
-
-      var panel = modal.querySelector('.takeover-panel');
-      if (window.gsap && panel) {
-        gsap.to(panel, {
-          scale: 0.86,
-          opacity: 0,
-          filter: 'blur(16px)',
-          duration: 0.26,
-          ease: 'power2.in',
-          onComplete: function () {
-            modal.classList.remove('is-open');
-            panel.style.filter = '';
-            panel.style.opacity = '';
-            panel.style.transform = '';
-            document.body.style.overflow = '';
-          }
-        });
-      } else
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="
