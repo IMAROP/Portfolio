@@ -1,27 +1,29 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="description" content="Official developer portfolio of Rishabh Singh (Trivioner / imarop) — Full-Stack Web Developer & Telegram Bot Systems Architect from India." />
   <title>Rishabh Singh (Trivioner / imarop) — Full-Stack &amp; Bot Systems Portfolio</title>
 
-  <!-- Custom Google Fonts (with instant system fallback if offline) -->
+  <!-- Custom Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       100% SELF-CONTAINED PORTFOLIO ENGINE (ZERO EXTERNAL JS/ICON CDNs)
-       Every icon, logo, 3D card animation, and motion blur is baked into this file
-       so nothing ever goes missing on any ISP, mobile carrier, or host.
+       RISHABH SINGH PORTFOLIO — BULLETPROOF 3D PLAYING-CARD ENGINE
+       - Multi-CDN Image Proxy (bypasses ISP blocks on i.ibb.co in India)
+       - Zero preserve-3d/SVG-filter hit-test bugs on Mobile & Desktop
        ========================================================================== */
     :root {
       --bg-0: #040508;
       --bg-1: #0A0D14;
       --bg-2: #111622;
-      --surface: rgba(16, 20, 31, 0.82);
+      --surface: rgba(16, 20, 31, 0.84);
       --line: rgba(255, 255, 255, 0.09);
       --line-strong: rgba(255, 255, 255, 0.22);
       --text-primary: #F8FAFC;
@@ -125,35 +127,28 @@
       }
     }
 
-    /* Native Kinetic Motion-Blur Entry Animation (Zero external JS library needed) */
+    /* Native Kinetic Motion-Blur Entry Animation */
     @keyframes nativeMotionBlurIn {
       0% {
         opacity: 0;
-        transform: translate3d(0, 34px, 0) scale(0.97);
-        filter: blur(16px);
+        transform: translateY(28px) scale(0.97);
+        filter: blur(14px);
       }
-      65% {
+      70% {
         opacity: 1;
         filter: blur(2px);
       }
       100% {
         opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
-        filter: blur(0px);
+        transform: none;
+        filter: none;
       }
     }
 
     .anim-enter {
-      animation: nativeMotionBlurIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: nativeMotionBlurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     .anim-d1 { animation-delay: 0.1s; }
-    .anim-d2 { animation-delay: 0.2s; }
-
-    #motionStage {
-      will-change: transform, filter;
-      transform-origin: center center;
-      transition: filter 0.12s ease-out, transform 0.12s ease-out;
-    }
 
     .wrap {
       width: 100%;
@@ -177,7 +172,7 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      background: rgba(4, 5, 8, 0.82);
+      background: rgba(4, 5, 8, 0.84);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--line);
@@ -208,6 +203,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     .brand-avatar img {
       width: 100%;
@@ -311,7 +307,7 @@
       justify-content: space-around;
       padding: 0.4rem;
       border-radius: 999px;
-      background: rgba(10, 12, 18, 0.92);
+      background: rgba(10, 12, 18, 0.94);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid var(--line-strong);
@@ -581,7 +577,7 @@
     }
 
     /* ==========================================================================
-       TECH ARSENAL MARQUEE (100% INLINE SVG LOGOS — NEVER FAILS TO LOAD)
+       TECH ARSENAL MARQUEE
        ========================================================================== */
     .tech-ribbon {
       border-top: 1px solid var(--line);
@@ -599,7 +595,6 @@
       align-items: center;
       gap: 1.75rem;
       animation: ribbonScroll 26s linear infinite;
-      will-change: transform, filter;
     }
 
     @keyframes ribbonScroll {
@@ -621,7 +616,7 @@
     }
 
     /* ==========================================================================
-       02 // PLAYING-CARD SHAPED 3D REVOLVING PROJECT DECK
+       02 // PLAYING-CARD REVOLVING DECK (BULLETPROOF HIT-TESTING ON ALL DEVICES)
        ========================================================================== */
     .section-block {
       padding: 4rem 0;
@@ -674,14 +669,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
 
     .revolve-btn {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--line-strong);
       display: flex;
       align-items: center;
@@ -689,18 +684,19 @@
       color: var(--text-primary);
       transition: all 0.25s ease;
     }
-    .revolve-btn:hover {
+    .revolve-btn:hover,
+    .revolve-btn:active {
       background: var(--accent-volt);
       color: var(--bg-0);
       border-color: var(--accent-volt);
       transform: scale(1.06);
     }
 
+    /* Playing Card Deck Stage — Uses 2D/Perspective-Safe Transforms so Clicks NEVER miss */
     .playing-deck-viewport {
       position: relative;
       width: 100%;
-      height: 550px;
-      perspective: 1500px;
+      height: 540px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -711,68 +707,70 @@
 
     @media (max-width: 640px) {
       .playing-deck-viewport {
-        height: 525px;
+        height: 520px;
       }
     }
 
     .playing-deck-ring {
       position: relative;
-      width: 340px;
+      width: 336px;
       height: 495px;
-      transform-style: preserve-3d;
-      will-change: transform, filter;
     }
 
     @media (max-width: 420px) {
       .playing-deck-ring {
-        width: 300px;
-        height: 465px;
+        width: 296px;
+        height: 470px;
       }
     }
 
+    /* Authentic Board-Game / Playing Card Structure */
     .playing-card {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(160deg, #161B29 0%, #07090F 55%, #111522 100%);
+      background: linear-gradient(160deg, #171D2C 0%, #07090F 55%, #111624 100%);
       border: 2px solid rgba(255, 255, 255, 0.24);
       border-radius: 24px;
-      padding: 1.35rem 1.25rem;
+      padding: 1.3rem 1.2rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       cursor: pointer;
       user-select: none;
-      box-shadow: 0 30px 70px -12px rgba(0, 0, 0, 0.92), inset 0 0 28px rgba(255, 255, 255, 0.03);
+      box-shadow: 0 28px 65px -12px rgba(0, 0, 0, 0.92), inset 0 0 28px rgba(255, 255, 255, 0.03);
+      transform-origin: center bottom;
       transition: 
-        transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
-        filter 0.45s ease,
+        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 0.35s ease,
         border-color 0.35s ease,
         box-shadow 0.45s ease;
-      will-change: transform, opacity, filter;
       overflow: hidden;
     }
 
+    /* Ornamental Inner Playing-Card Frame Border */
     .playing-card::before {
       content: '';
       position: absolute;
       inset: 9px;
       border-radius: 17px;
-      border: 1px solid rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       pointer-events: none;
       z-index: 1;
       transition: border-color 0.35s ease;
     }
 
+    /* Holographic Foil Sheen */
     .playing-card::after {
       content: '';
       position: absolute;
       inset: 0;
       background: radial-gradient(
         360px circle at var(--cx, 50%) var(--cy, 30%),
-        rgba(255, 255, 255, 0.12),
+        rgba(255, 255, 255, 0.13),
         transparent 55%
       );
       opacity: 0;
@@ -784,72 +782,87 @@
       opacity: 1;
     }
 
+    /* Active Suit Glows */
     .playing-card.suit-hearts[data-pos="0"] {
       border-color: var(--accent-crimson);
-      box-shadow: 0 32px 85px -16px rgba(255, 46, 84, 0.35), inset 0 0 30px rgba(255, 46, 84, 0.08);
+      box-shadow: 0 30px 80px -14px rgba(255, 46, 84, 0.4), inset 0 0 30px rgba(255, 46, 84, 0.09);
     }
     .playing-card.suit-hearts[data-pos="0"]::before {
-      border-color: rgba(255, 46, 84, 0.35);
+      border-color: rgba(255, 46, 84, 0.38);
     }
 
     .playing-card.suit-spades[data-pos="0"] {
       border-color: var(--accent-cobalt);
-      box-shadow: 0 32px 85px -16px rgba(59, 130, 246, 0.35), inset 0 0 30px rgba(59, 130, 246, 0.08);
+      box-shadow: 0 30px 80px -14px rgba(59, 130, 246, 0.4), inset 0 0 30px rgba(59, 130, 246, 0.09);
     }
     .playing-card.suit-spades[data-pos="0"]::before {
-      border-color: rgba(59, 130, 246, 0.35);
+      border-color: rgba(59, 130, 246, 0.38);
     }
 
     .playing-card.suit-joker[data-pos="0"] {
       border-color: var(--accent-volt);
-      box-shadow: 0 32px 85px -16px rgba(212, 255, 0, 0.3), inset 0 0 30px rgba(212, 255, 0, 0.07);
+      box-shadow: 0 30px 80px -14px rgba(212, 255, 0, 0.32), inset 0 0 30px rgba(212, 255, 0, 0.08);
     }
     .playing-card.suit-joker[data-pos="0"]::before {
-      border-color: rgba(212, 255, 0, 0.35);
+      border-color: rgba(212, 255, 0, 0.38);
     }
 
+    /* 3-Card Playing Hand / Revolving Fan Positions (No translateZ so mobile touch is 100% accurate!) */
     .playing-card[data-pos="0"] {
-      transform: translate3d(0, 0, 120px) rotateY(0deg) rotateZ(0deg) scale(1);
+      transform: translate(0, 0) rotate(0deg) scale(1);
       opacity: 1;
-      z-index: 10;
+      z-index: 30;
+      filter: none;
     }
 
     .playing-card[data-pos="1"] {
-      transform: translate3d(78%, 14px, -85px) rotateY(-26deg) rotateZ(7deg) scale(0.86);
-      opacity: 0.65;
-      z-index: 5;
-      filter: blur(2px);
+      transform: translate(76%, 18px) rotate(9deg) scale(0.86);
+      opacity: 0.68;
+      z-index: 20;
+      filter: blur(1.5px) brightness(0.82);
+    }
+    .playing-card[data-pos="1"]:hover {
+      opacity: 0.92;
+      filter: none;
+      transform: translate(76%, 8px) rotate(7deg) scale(0.89);
     }
 
     .playing-card[data-pos="-1"] {
-      transform: translate3d(-78%, 14px, -85px) rotateY(26deg) rotateZ(-7deg) scale(0.86);
-      opacity: 0.65;
-      z-index: 5;
-      filter: blur(2px);
+      transform: translate(-76%, 18px) rotate(-9deg) scale(0.86);
+      opacity: 0.68;
+      z-index: 15;
+      filter: blur(1.5px) brightness(0.82);
+    }
+    .playing-card[data-pos="-1"]:hover {
+      opacity: 0.92;
+      filter: none;
+      transform: translate(-76%, 8px) rotate(-7deg) scale(0.89);
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 780px) {
       .playing-card[data-pos="1"] {
-        transform: translate3d(24%, 18px, -80px) rotateY(-16deg) rotateZ(5deg) scale(0.88);
-        opacity: 0.42;
+        transform: translate(22%, 18px) rotate(6deg) scale(0.88);
+        opacity: 0.45;
       }
       .playing-card[data-pos="-1"] {
-        transform: translate3d(-24%, 18px, -80px) rotateY(16deg) rotateZ(-5deg) scale(0.88);
-        opacity: 0.42;
+        transform: translate(-22%, 18px) rotate(-6deg) scale(0.88);
+        opacity: 0.45;
       }
     }
 
+    /* Pure CSS Motion-Blur Burst while Revolving & Zooming */
     .revolving-blur-burst .playing-card {
-      filter: url(#svgHorizontalBlur) blur(7px) !important;
+      filter: blur(6px) !important;
     }
 
     .card-zooming-out {
-      transform: translate3d(0, 0, 380px) scale(1.22) !important;
-      filter: url(#svgZoomBlur) blur(16px) !important;
+      transform: translate(0, -15px) scale(1.18) !important;
+      filter: blur(12px) !important;
       opacity: 0 !important;
-      transition: all 0.42s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transition: all 0.36s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
+    /* Playing Card Corner Indices */
     .card-corner-top {
       display: flex;
       align-items: center;
@@ -886,6 +899,7 @@
       color: #E2E8F0;
     }
 
+    /* Playing Card Center Artwork Medallion */
     .card-center-art {
       position: relative;
       z-index: 3;
@@ -893,36 +907,47 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      margin: 0.4rem 0;
+      margin: 0.25rem 0;
     }
 
     .card-medallion {
-      width: 86px;
-      height: 86px;
+      width: 88px;
+      height: 88px;
       border-radius: 22px;
       overflow: hidden;
       border: 2px solid var(--line-strong);
       background: linear-gradient(135deg, #1B2234, #080A10);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .playing-card:hover .card-medallion {
-      transform: scale(1.08) translateY(-3px);
+      transform: scale(1.07) translateY(-2px);
     }
     .card-medallion img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      position: relative;
+      z-index: 2;
+    }
+    .medallion-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
     }
 
     .card-project-name {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.38rem;
+      font-size: 1.35rem;
       color: #fff;
       line-height: 1.12;
       text-transform: uppercase;
@@ -931,21 +956,21 @@
 
     .card-project-sub {
       font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-secondary);
       margin-top: 0.2rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.65rem;
     }
 
     .card-lore-box {
-      background: rgba(4, 5, 8, 0.78);
+      background: rgba(4, 5, 8, 0.82);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 0.75rem 0.85rem;
-      font-size: 0.8rem;
+      padding: 0.7rem 0.8rem;
+      font-size: 0.79rem;
       color: #CBD5E1;
-      line-height: 1.5;
-      margin-bottom: 0.8rem;
+      line-height: 1.48;
+      margin-bottom: 0.7rem;
       width: 100%;
     }
 
@@ -953,40 +978,51 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.35rem;
+      gap: 0.32rem;
       width: 100%;
     }
 
     .card-pill {
       font-family: var(--font-mono);
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       text-transform: uppercase;
-      padding: 0.2rem 0.48rem;
+      padding: 0.18rem 0.46rem;
       border-radius: 5px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--line);
       color: #E2E8F0;
     }
 
+    /* Playing Card Bottom Action Button & Inverted Corner Rank */
     .card-corner-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
-      z-index: 3;
+      z-index: 5;
       padding-top: 0.65rem;
       border-top: 1px solid var(--line);
     }
 
-    .card-open-label {
+    .card-action-btn {
       font-family: var(--font-mono);
       font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.4rem;
+      padding: 0.42rem 0.8rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--line-strong);
       color: var(--accent-volt);
+      transition: all 0.2s ease;
+    }
+    .playing-card:hover .card-action-btn {
+      background: var(--accent-volt);
+      color: var(--bg-0);
+      border-color: var(--accent-volt);
     }
 
     .card-rank-inverted {
@@ -1001,25 +1037,33 @@
       opacity: 0.85;
     }
 
-    .carousel-dots {
+    /* Quick Card Selector Tabs + Dots */
+    .card-quick-tabs {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 0.55rem;
-      margin-top: 0.25rem;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
     }
 
-    .dot-btn {
-      width: 28px;
-      height: 6px;
+    .quick-tab-btn {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.16);
-      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-strong);
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
     }
-    .dot-btn.active {
-      width: 48px;
+    .quick-tab-btn.active {
       background: var(--accent-volt);
-      box-shadow: 0 0 12px rgba(212, 255, 0, 0.5);
+      color: var(--bg-0);
+      border-color: var(--accent-volt);
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(212, 255, 0, 0.35);
     }
 
     /* ==========================================================================
@@ -1216,15 +1260,15 @@
     }
 
     /* ==========================================================================
-       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL (NATIVE CSS MOTION-BLUR ANIMATION)
+       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL
        ========================================================================== */
     .takeover-backdrop {
       position: fixed;
       inset: 0;
       z-index: 100;
       background: rgba(3, 4, 8, 0.92);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
       display: none;
       align-items: center;
       justify-content: center;
@@ -1244,8 +1288,8 @@
     @keyframes modalZoomBlurIn {
       0% {
         opacity: 0;
-        transform: scale(0.8) translate3d(0, 30px, 0);
-        filter: blur(22px);
+        transform: scale(0.82) translateY(28px);
+        filter: blur(18px);
       }
       70% {
         opacity: 1;
@@ -1253,8 +1297,8 @@
       }
       100% {
         opacity: 1;
-        transform: scale(1) translate3d(0, 0, 0);
-        filter: blur(0px);
+        transform: none;
+        filter: none;
       }
     }
 
@@ -1267,7 +1311,7 @@
       border: 1px solid var(--line-strong);
       padding: 1.5rem 1.25rem 3.5rem;
       box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95);
-      animation: modalZoomBlurIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: modalZoomBlurIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     @media (min-width: 768px) {
@@ -1326,11 +1370,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     .work-logo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      position: relative;
+      z-index: 2;
     }
 
     .work-badge {
@@ -1535,21 +1582,6 @@
 </head>
 <body>
 
-  <!-- INLINE SVG MOTION BLUR FILTERS -->
-  <svg width="0" height="0" style="position:absolute; pointer-events:none;">
-    <defs>
-      <filter id="svgVerticalBlur" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur id="vBlurNode" in="SourceGraphic" stdDeviation="0, 0" />
-      </filter>
-      <filter id="svgHorizontalBlur" x="-30%" y="-20%" width="160%" height="140%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="14, 1.2" />
-      </filter>
-      <filter id="svgZoomBlur" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="12, 12" />
-      </filter>
-    </defs>
-  </svg>
-
   <!-- Subtle Studio Film Grain -->
   <div class="noise-overlay"></div>
 
@@ -1564,12 +1596,16 @@
     <div class="wrap header-row">
       <a href="#intro" class="brand-mark">
         <div class="brand-avatar">
+          <!-- Loaded via Global CDN Proxy (wsrv.nl / i0.wp.com) so Indian ISPs never block i.ibb.co! -->
           <img 
-            src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+            class="smart-img"
+            src="https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+            data-wp="https://i0.wp.com/i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
+            data-raw="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
             alt="Rishabh Singh Logo" 
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            referrerpolicy="no-referrer"
           />
-          <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-volt);">RS</div>
+          <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-volt); font-size:0.9rem;">RS</div>
         </div>
         <div class="brand-text">
           <span>Rishabh Singh</span>
@@ -1591,7 +1627,7 @@
     </div>
   </header>
 
-  <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK (WITH INLINE SVGs) -->
+  <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK -->
   <nav class="mobile-bottom-dock" aria-label="Mobile Navigation">
     <a href="#intro" class="dock-link">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1673,11 +1709,14 @@
 
                 <div class="logo-frame" title="Rishabh Singh Official Logo">
                   <img 
-                    src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+                    class="smart-img"
+                    src="https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+                    data-wp="https://i0.wp.com/i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
+                    data-raw="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
                     alt="Rishabh Singh Official Logo" 
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    referrerpolicy="no-referrer"
                   />
-                  <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:2.1rem; color:var(--accent-volt);">
+                  <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; font-size:2.1rem; color:var(--accent-volt);">
                     RS
                   </div>
                 </div>
@@ -1713,7 +1752,7 @@
         </div>
       </section>
 
-      <!-- TECH STACK RIBBON (100% INLINE SVG ICONS SO THEY NEVER GO MISSING) -->
+      <!-- TECH STACK RIBBON -->
       <div class="tech-ribbon" aria-hidden="true">
         <div class="tech-track" id="techTrack">
           <span class="tech-pill">
@@ -1761,10 +1800,6 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2E54" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             <span>Google Firebase Realtime</span>
           </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <span>HTML5 &amp; Mini WebApps</span>
-          </span>
         </div>
       </div>
 
@@ -1786,24 +1821,27 @@
           <!-- Deck Navigation Controls -->
           <div class="deck-controls-bar">
             <div style="display:flex; align-items:center; gap:0.65rem;">
-              <button type="button" id="prevCardBtn" class="revolve-btn" aria-label="Previous Project Card">
+              <button type="button" id="prevCardBtn" onclick="stepCarousel(-1); startAutoRevolve();" class="revolve-btn" aria-label="Previous Project Card">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-              <button type="button" id="nextCardBtn" class="revolve-btn" aria-label="Next Project Card">
+              <button type="button" id="nextCardBtn" onclick="stepCarousel(1); startAutoRevolve();" class="revolve-btn" aria-label="Next Project Card">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
-              <button type="button" id="toggleAutoRevolveBtn" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
+              <button type="button" id="toggleAutoRevolveBtn" onclick="toggleAutoCycle();" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                 <span id="autoRevolveLabel">Auto-Cycle: ON</span>
               </button>
             </div>
 
-            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary);">
-              CLICK ANY CARD FOR FULL DETAILS
+            <!-- Direct Card Switcher Pills -->
+            <div class="card-quick-tabs">
+              <button type="button" class="quick-tab-btn active" data-goto="0" onclick="selectCardDirect(0)">A♥ Date Anyone Bot</button>
+              <button type="button" class="quick-tab-btn" data-goto="1" onclick="selectCardDirect(1)">K♠ Command Hub</button>
+              <button type="button" class="quick-tab-btn" data-goto="2" onclick="selectCardDirect(2)">★ More &amp; Client Work</button>
             </div>
           </div>
 
-          <!-- PLAYING-CARD PROPORTIONED 3D REVOLVING STAGE -->
+          <!-- PLAYING-CARD PROPORTIONED REVOLVING STAGE -->
           <div class="playing-deck-viewport" id="revolveViewport">
             <div class="playing-deck-ring" id="revolveRing">
 
@@ -1816,6 +1854,7 @@
                 data-pos="0" 
                 data-target="datebot"
                 id="revolveCard0"
+                onclick="handleCardClick(0, 'datebot')"
                 role="button"
                 tabindex="0"
                 aria-label="Date Anyone Robot — Click to view full project details"
@@ -1835,11 +1874,16 @@
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-crimson);">
                     <img 
-                      src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+                      class="smart-img"
+                      src="https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+                      data-wp="https://i0.wp.com/i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
+                      data-raw="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
                       alt="Date Anyone Robot Logo" 
-                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                      referrerpolicy="no-referrer"
                     />
-                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:1.5rem; color:var(--accent-crimson);">DA</div>
+                    <div class="medallion-fallback" style="color:var(--accent-crimson);">
+                      <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </div>
                   </div>
 
                   <h3 class="card-project-name">Date Anyone Robot</h3>
@@ -1858,10 +1902,10 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <span class="card-open-label" style="color:#FF8096;">
-                    <span>Tap to Open Card</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </span>
+                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard0', 'datebot');">
+                    <span>Open Full Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </button>
                   <div class="card-rank-inverted" style="color:var(--accent-crimson);">
                     <span>A</span>
                     <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
@@ -1880,6 +1924,7 @@
                 data-pos="1" 
                 data-target="cmdhub"
                 id="revolveCard1"
+                onclick="handleCardClick(1, 'cmdhub')"
                 role="button"
                 tabindex="0"
                 aria-label="Command Hub — Click to view full project details"
@@ -1899,11 +1944,16 @@
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-cobalt);">
                     <img 
-                      src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+                      class="smart-img"
+                      src="https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+                      data-wp="https://i0.wp.com/i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
+                      data-raw="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
                       alt="Command Hub Logo" 
-                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                      referrerpolicy="no-referrer"
                     />
-                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:1.5rem; color:var(--accent-cobalt);">CH</div>
+                    <div class="medallion-fallback" style="color:var(--accent-cobalt);">
+                      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
                   </div>
 
                   <h3 class="card-project-name">COMMAND HUB</h3>
@@ -1922,10 +1972,10 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <span class="card-open-label" style="color:#93C5FD;">
-                    <span>Tap to Open Card</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </span>
+                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard1', 'cmdhub');">
+                    <span>Open Full Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </button>
                   <div class="card-rank-inverted" style="color:var(--accent-cobalt);">
                     <span>K</span>
                     <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
@@ -1944,6 +1994,7 @@
                 data-pos="-1" 
                 data-target="morework"
                 id="revolveCard2"
+                onclick="handleCardClick(2, 'morework')"
                 role="button"
                 tabindex="0"
                 aria-label="More Projects and Custom Client Builds — Click to view details"
@@ -1981,10 +2032,10 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <span class="card-open-label">
-                    <span>Tap to Open Card</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </span>
+                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard2', 'morework');">
+                    <span>Open Full Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </button>
                   <div class="card-rank-inverted" style="color:var(--accent-volt);">
                     <span>★</span>
                     <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
@@ -1999,16 +2050,16 @@
 
           <!-- 3 Indicator Dots -->
           <div class="carousel-dots">
-            <button type="button" class="dot-btn active" data-goto="0" aria-label="Date Anyone Robot Card"></button>
-            <button type="button" class="dot-btn" data-goto="1" aria-label="Command Hub Card"></button>
-            <button type="button" class="dot-btn" data-goto="2" aria-label="More Projects and Client Work Card"></button>
+            <button type="button" class="dot-btn active" data-goto="0" onclick="selectCardDirect(0)" aria-label="Date Anyone Robot Card"></button>
+            <button type="button" class="dot-btn" data-goto="1" onclick="selectCardDirect(1)" aria-label="Command Hub Card"></button>
+            <button type="button" class="dot-btn" data-goto="2" onclick="selectCardDirect(2)" aria-label="More Projects and Client Work Card"></button>
           </div>
 
         </div>
       </section>
 
       <!-- =================================================================
-           03 // WHAT I BUILD & MASTER (100% INLINE SVG ICONS)
+           03 // WHAT I BUILD & MASTER
            ================================================================= -->
       <section id="capabilities" class="section-block">
         <div class="wrap">
@@ -2023,7 +2074,6 @@
           </div>
 
           <div class="bento-grid">
-            <!-- Skill 1 -->
             <div class="bento-card">
               <div>
                 <div class="vector-box">
@@ -2041,7 +2091,6 @@
               </div>
             </div>
 
-            <!-- Skill 2 -->
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-cobalt);">
@@ -2059,7 +2108,6 @@
               </div>
             </div>
 
-            <!-- Skill 3 -->
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-crimson);">
@@ -2077,7 +2125,6 @@
               </div>
             </div>
 
-            <!-- Skill 4 -->
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-mint);">
@@ -2096,7 +2143,6 @@
             </div>
           </div>
 
-          <!-- 4-Step Engineering Workflow Strip -->
           <div class="process-strip">
             <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.08em;">
               HOW I ENGINEER COMPLEX PROJECTS FROM SCRATCH
@@ -2130,7 +2176,6 @@
 
       <!-- =================================================================
            04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & CONTACT ME
-           (100% INLINE SVG LOGOS SO GITHUB & TELEGRAM ICONS ALWAYS RENDER)
            ================================================================= -->
       <section id="connect" class="section-block" style="border-bottom:none;">
         <div class="wrap">
@@ -2158,7 +2203,6 @@
                 </div>
               </div>
 
-              <!-- Placed at the bottom with 100% inline SVG icons -->
               <div class="directory-stack">
                 <a href="https://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
@@ -2225,11 +2269,14 @@
         <div style="display:flex; align-items:center; gap:0.95rem;">
           <div class="work-logo" style="border-color:var(--accent-crimson);">
             <img 
-              src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+              class="smart-img"
+              src="https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+              data-wp="https://i0.wp.com/i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
+              data-raw="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
               alt="Date Anyone Robot Logo" 
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              referrerpolicy="no-referrer"
             />
-            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
+            <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
           </div>
           <div>
             <div class="work-badge badge-crimson">PROJECT CASE STUDY // CARD 01</div>
@@ -2366,11 +2413,14 @@
         <div style="display:flex; align-items:center; gap:0.95rem;">
           <div class="work-logo" style="border-color:var(--accent-cobalt);">
             <img 
-              src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+              class="smart-img"
+              src="https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+              data-wp="https://i0.wp.com/i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
+              data-raw="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
               alt="Command Hub Logo" 
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              referrerpolicy="no-referrer"
             />
-            <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
+            <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
           </div>
           <div>
             <div class="work-badge badge-cobalt">PROJECT CASE STUDY // CARD 02</div>
@@ -2458,35 +2508,4 @@
         <div class="ext-links-grid">
           <a href="https://t.me/CommandHUBRoBOT" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-cobalt); background:rgba(59,130,246,0.14);">
             <span>Launch COMMAND HUB (CommandHUBRoBOT)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-          <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-            <span>Updates Channel (t.me/Trivioner)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- =====================================================================
-       FULLSCREEN ZOOM TAKEOVER 3: MORE PROJECTS & CUSTOM CLIENT BUILDS
-       ===================================================================== -->
-  <div id="takeover-morework" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkMoreTitle">
-    <div class="takeover-panel" onclick="event.stopPropagation();">
-      <div class="takeover-header">
-        <div style="display:flex; align-items:center; gap:0.95rem;">
-          <div class="work-logo" style="border-color:var(--accent-volt); color:var(--accent-volt);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          </div>
-          <div>
-            <div class="work-badge badge-volt">EXPANDING DECK // CLIENT &amp; FUTURE PROJECTS</div>
-            <h3 id="tkMoreTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
-              More Projects &amp; Custom Client Work
-            </h3>
-          </div>
-        </div>
-        <button type="button" id="closeTkMoreBtn" class="close-takeover-btn" onclick="closeTakeover('morework')">
-          <span>Close</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="
+            <svg width="15" height="15" viewBox="0 0 24
