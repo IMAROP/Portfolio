@@ -3,21 +3,295 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <meta name="referrer" content="no-referrer" />
   <meta name="description" content="Official developer portfolio of Rishabh Singh (Trivioner / imarop) — Full-Stack Web Developer & Telegram Bot Systems Architect from India." />
   <title>Rishabh Singh (Trivioner / imarop) — Full-Stack &amp; Bot Systems Portfolio</title>
 
-  <!-- Custom Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+  <!-- CORE INTERACTIVE ENGINE IN HEAD (Never gets cut off on copy-paste; works with CSS :target fallback too) -->
+  <script>
+    window.activeDeckIndex = 0;
+    window.deckTotal = 3;
+    window.deckAutoTimer = null;
+    window.deckAutoEnabled = true;
+    window.cardTargets = ['datebot', 'cmdhub', 'morework'];
+
+    window.applyDeckPositions = function (withMotionBlur) {
+      var ring = document.getElementById('revolveRing');
+      var cards = document.querySelectorAll('.playing-card');
+      var tabs = document.querySelectorAll('.quick-tab-btn');
+      var dots = document.querySelectorAll('.dot-btn');
+      if (!cards.length) return;
+
+      if (withMotionBlur && ring) {
+        ring.classList.remove('deck-motion-blur');
+        void ring.offsetWidth; // trigger reflow for visible motion blur burst
+        ring.classList.add('deck-motion-blur');
+        setTimeout(function () {
+          if (ring) ring.classList.remove('deck-motion-blur');
+        }, 480);
+      }
+
+      for (var i = 0; i < cards.length; i++) {
+        var diff = (i - window.activeDeckIndex + window.deckTotal) % window.deckTotal;
+        var pos = '0';
+        if (diff === 1) pos = '1';
+        else if (diff === 2) pos = '-1';
+        cards[i].setAttribute('data-pos', pos);
+      }
+
+      for (var j = 0; j < tabs.length; j++) {
+        if (j === window.activeDeckIndex) tabs[j].classList.add('active');
+        else tabs[j].classList.remove('active');
+      }
+
+      for (var k = 0; k < dots.length; k++) {
+        if (k === window.activeDeckIndex) dots[k].classList.add('active');
+        else dots[k].classList.remove('active');
+      }
+    };
+
+    window.stepDeck = function (dir) {
+      window.activeDeckIndex = (window.activeDeckIndex + dir + window.deckTotal) % window.deckTotal;
+      window.applyDeckPositions(true);
+    };
+
+    window.jumpToCard = function (idx) {
+      window.activeDeckIndex = idx;
+      window.applyDeckPositions(true);
+      window.restartAutoDeck();
+    };
+
+    window.toggleDeckAuto = function () {
+      window.deckAutoEnabled = !window.deckAutoEnabled;
+      var lbl = document.getElementById('autoRevolveLabel');
+      if (lbl) lbl.textContent = window.deckAutoEnabled ? 'Auto-Revolve: ON' : 'Auto-Revolve: PAUSED';
+    };
+
+    window.restartAutoDeck = function () {
+      if (window.deckAutoTimer) clearInterval(window.deckAutoTimer);
+      window.deckAutoTimer = setInterval(function () {
+        var anyOpen = document.querySelector('.takeover-backdrop.is-open');
+        if (window.deckAutoEnabled && !anyOpen) {
+          window.stepDeck(1);
+        }
+      }, 3600);
+    };
+
+    window.openCardModal = function (idx, modalId, ev) {
+      if (ev) ev.preventDefault();
+      var cardEl = document.getElementById('revolveCard' + idx);
+
+      // If clicking a side card, revolve it to front with motion blur first, then zoom open!
+      if (idx !== window.activeDeckIndex) {
+        window.activeDeckIndex = idx;
+        window.applyDeckPositions(true);
+        window.restartAutoDeck();
+      }
+
+      if (cardEl) {
+        cardEl.classList.add('card-zoom-burst');
+      }
+
+      setTimeout(function () {
+        if (cardEl) cardEl.classList.remove('card-zoom-burst');
+        var modal = document.getElementById('takeover-' + modalId);
+        var stage = document.getElementById('motionStage');
+        if (modal) {
+          modal.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+        }
+        if (stage) {
+          stage.classList.add('stage-blurred-bg');
+        }
+      }, 280);
+    };
+
+    window.closeCardModal = function (modalId, ev) {
+      if (ev) ev.preventDefault();
+      var modal = document.getElementById('takeover-' + modalId);
+      var stage = document.getElementById('motionStage');
+      if (modal) {
+        modal.classList.remove('is-open');
+      }
+      if (stage) {
+        stage.classList.remove('stage-blurred-bg');
+      }
+      document.body.style.overflow = '';
+      if (window.location.hash && window.location.hash.indexOf('takeover-') !== -1) {
+        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      window.applyDeckPositions(false);
+      window.restartAutoDeck();
+
+      // Touch Swipe & Mouse Drag on Playing Card Deck
+      var vp = document.getElementById('revolveViewport');
+      var startX = 0;
+      var dragging = false;
+      if (vp) {
+        vp.addEventListener('touchstart', function (e) {
+          if (e.touches && e.touches[0]) startX = e.touches[0].clientX;
+        }, { passive: true });
+        vp.addEventListener('touchend', function (e) {
+          if (e.changedTouches && e.changedTouches[0]) {
+            var dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 35) {
+              window.stepDeck(dx < 0 ? 1 : -1);
+              window.restartAutoDeck();
+            }
+          }
+        }, { passive: true });
+        vp.addEventListener('mousedown', function (e) {
+          dragging = true;
+          startX = e.clientX;
+        });
+        window.addEventListener('mouseup', function (e) {
+          if (!dragging) return;
+          dragging = false;
+          var dx = e.clientX - startX;
+          if (Math.abs(dx) > 45) {
+            window.stepDeck(dx < 0 ? 1 : -1);
+            window.restartAutoDeck();
+          }
+        });
+      }
+
+      // Close modal on Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          window.closeCardModal('datebot');
+          window.closeCardModal('cmdhub');
+          window.closeCardModal('morework');
+        }
+      });
+
+      // Scroll Motion Blur + Speed Streaks Canvas
+      var stage = document.getElementById('motionStage');
+      var lastY = window.scrollY || 0;
+      var vel = 0;
+      var targetVel = 0;
+
+      window.addEventListener('scroll', function () {
+        var nowY = window.scrollY || 0;
+        targetVel = Math.max(-45, Math.min(45, nowY - lastY));
+        lastY = nowY;
+      }, { passive: true });
+
+      var canvas = document.getElementById('ambientCanvas');
+      var ctx = canvas ? canvas.getContext('2d') : null;
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      var orbs = [];
+      var nodes = [];
+
+      if (canvas && ctx) {
+        canvas.width = w;
+        canvas.height = h;
+        orbs = [
+          { x: w * 0.2, y: h * 0.25, r: 250, c: 'rgba(212, 255, 0, 0.055)', vx: 0.25, vy: 0.18 },
+          { x: w * 0.8, y: h * 0.55, r: 280, c: 'rgba(59, 130, 246, 0.06)', vx: -0.22, vy: 0.2 },
+          { x: w * 0.45, y: h * 0.85, r: 240, c: 'rgba(255, 46, 84, 0.045)', vx: 0.18, vy: -0.2 }
+        ];
+        var cnt = Math.min(34, Math.floor((w * h) / 28000));
+        for (var i = 0; i < cnt; i++) {
+          nodes.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.45,
+            vy: (Math.random() - 0.5) * 0.45,
+            r: Math.random() * 2 + 1.2,
+            glow: i % 3 === 0 ? 'rgba(212, 255, 0, 0.65)' : 'rgba(148, 163, 184, 0.45)'
+          });
+        }
+        window.addEventListener('resize', function () {
+          w = window.innerWidth;
+          h = window.innerHeight;
+          canvas.width = w;
+          canvas.height = h;
+        });
+      }
+
+      function tick() {
+        vel += (targetVel - vel) * 0.24;
+        targetVel *= 0.82;
+        var absV = Math.abs(vel);
+        var anyOpen = document.querySelector('.takeover-backdrop.is-open');
+
+        if (!anyOpen && stage) {
+          if (absV > 1.0) {
+            var blurVal = Math.min(9, absV * 0.28).toFixed(1);
+            stage.style.filter = 'blur(' + blurVal + 'px)';
+          } else if (stage.style.filter && stage.style.filter !== 'none') {
+            stage.style.filter = 'none';
+          }
+        }
+
+        if (ctx) {
+          ctx.clearRect(0, 0, w, h);
+          for (var k = 0; k < orbs.length; k++) {
+            var o = orbs[k];
+            o.x += o.vx;
+            o.y += o.vy;
+            if (o.x < 0 || o.x > w) o.vx *= -1;
+            if (o.y < 0 || o.y > h) o.vy *= -1;
+            var g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+            g.addColorStop(0, o.c);
+            g.addColorStop(1, 'transparent');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          var boost = 1 + absV * 0.16;
+          for (var i = 0; i < nodes.length; i++) {
+            var n = nodes[i];
+            n.x += n.vx * boost;
+            n.y += n.vy * boost;
+            if (n.x < 0 || n.x > w) n.vx *= -1;
+            if (n.y < 0 || n.y > h) n.vy *= -1;
+
+            var halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 4);
+            halo.addColorStop(0, n.glow);
+            halo.addColorStop(1, 'transparent');
+            ctx.fillStyle = halo;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r * 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#F8FAFC';
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r * 0.75, 0, Math.PI * 2);
+            ctx.fill();
+
+            for (var j = i + 1; j < nodes.length; j++) {
+              var n2 = nodes[j];
+              var dx = n.x - n2.x;
+              var dy = n.y - n2.y;
+              var dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 135) {
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.strokeStyle = 'rgba(148, 163, 184, ' + (0.12 * (1 - dist / 135)) + ')';
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+              }
+            }
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  </script>
 
   <style>
-    /* ==========================================================================
-       RISHABH SINGH PORTFOLIO — BULLETPROOF 3D PLAYING-CARD ENGINE
-       - Multi-CDN Image Proxy (bypasses ISP blocks on i.ibb.co in India)
-       - Zero preserve-3d/SVG-filter hit-test bugs on Mobile & Desktop
-       ========================================================================== */
     :root {
       --bg-0: #040508;
       --bg-1: #0A0D14;
@@ -37,693 +311,111 @@
       --font-mono: 'Space Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background-color: var(--bg-0);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      color-scheme: dark;
-    }
-
-    body {
-      background-color: var(--bg-0);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.6;
-      position: relative;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font-family: inherit;
-      background: none;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    svg {
-      display: inline-block;
-      vertical-align: middle;
-      flex-shrink: 0;
-    }
-
-    /* Subtle Studio Film Grain */
-    .noise-overlay {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 35;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-
-    /* Smooth Constellation & Aurora Canvas */
-    #ambientCanvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* Custom Desktop Cursor Ring */
-    .cursor-ring {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 32px;
-      height: 32px;
-      border: 1.5px solid var(--accent-volt);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 120;
-      transform: translate(-50%, -50%);
-      mix-blend-mode: difference;
-      display: none;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .cursor-ring {
-        display: block;
-      }
-    }
-
-    /* Native Kinetic Motion-Blur Entry Animation */
-    @keyframes nativeMotionBlurIn {
-      0% {
-        opacity: 0;
-        transform: translateY(28px) scale(0.97);
-        filter: blur(14px);
-      }
-      70% {
-        opacity: 1;
-        filter: blur(2px);
-      }
-      100% {
-        opacity: 1;
-        transform: none;
-        filter: none;
-      }
-    }
-
-    .anim-enter {
-      animation: nativeMotionBlurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-    .anim-d1 { animation-delay: 0.1s; }
-
-    .wrap {
-      width: 100%;
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 1.15rem;
-      position: relative;
-      z-index: 10;
-    }
-
-    @media (min-width: 768px) {
-      .wrap {
-        padding: 0 2.25rem;
-      }
-    }
-
-    /* ==========================================================================
-       TOP HEADER & MOBILE BOTTOM DOCK
-       ========================================================================== */
-    .top-header {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: rgba(4, 5, 8, 0.84);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 68px;
-      gap: 0.75rem;
-    }
-
-    .brand-mark {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .brand-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--line-strong);
-      background: linear-gradient(135deg, #161F33, #090C14);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .brand-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .brand-text {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 0.98rem;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .alias-pill {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      background: rgba(212, 255, 0, 0.12);
-      color: var(--accent-volt);
-      border: 1px solid rgba(212, 255, 0, 0.3);
-      letter-spacing: 0.03em;
-    }
-
-    .desktop-nav {
-      display: none;
-      align-items: center;
-      gap: 0.3rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--line);
-      padding: 0.28rem;
-      border-radius: 999px;
-    }
-
-    @media (min-width: 820px) {
-      .desktop-nav {
-        display: flex;
-      }
-    }
-
-    .nav-item {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      padding: 0.45rem 0.95rem;
-      border-radius: 999px;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .nav-item:hover {
-      color: var(--bg-0);
-      background: var(--accent-volt);
-      font-weight: 700;
-    }
-
-    .availability-badge {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: #E2E8F0;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid var(--line-strong);
-      background: rgba(255, 255, 255, 0.03);
-      flex-shrink: 0;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent-mint);
-      box-shadow: 0 0 10px var(--accent-mint);
-      animation: pulseGlow 2.2s infinite ease-in-out;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.25); }
-    }
-
-    /* Mobile Bottom Dock */
-    .mobile-bottom-dock {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 40;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0.4rem;
-      border-radius: 999px;
-      background: rgba(10, 12, 18, 0.94);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--line-strong);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
-      width: calc(100% - 1.5rem);
-      max-width: 400px;
-    }
-
-    @media (min-width: 820px) {
-      .mobile-bottom-dock {
-        display: none;
-      }
-    }
-
-    .dock-link {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2rem;
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      padding: 0.38rem 0.65rem;
-      border-radius: 999px;
-      transition: all 0.2s ease;
-    }
-    .dock-link:hover,
-    .dock-link:active {
-      color: var(--accent-volt);
-      background: rgba(212, 255, 0, 0.09);
-    }
-
-    /* ==========================================================================
-       01 // HERO SECTION
-       ========================================================================== */
-    .hero-section {
-      padding: 2.75rem 0 3.5rem;
-      position: relative;
-    }
-
-    @media (min-width: 768px) {
-      .hero-section {
-        padding: 5rem 0 4.5rem;
-      }
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2.25rem;
-      align-items: center;
-    }
-
-    @media (min-width: 960px) {
-      .hero-grid {
-        grid-template-columns: 1.3fr 0.9fr;
-        gap: 3.5rem;
-      }
-    }
-
-    .eyebrow-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.4rem 0.85rem;
-      border: 1px solid var(--line-strong);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-primary);
-      margin-bottom: 1.25rem;
-    }
-
-    .hero-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(2.2rem, 6vw, 4.5rem);
-      line-height: 0.98;
-      letter-spacing: -0.035em;
-      text-transform: uppercase;
-      margin-bottom: 1.25rem;
-    }
-
-    .volt-text {
-      color: var(--accent-volt);
-    }
-
-    .stroke-text {
-      -webkit-text-stroke: 1.5px rgba(248, 250, 252, 0.85);
-      color: transparent;
-    }
-
-    .alias-banner {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-    }
-
-    .alias-badge {
-      padding: 0.25rem 0.65rem;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--line-strong);
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .hero-lead {
-      font-size: clamp(0.98rem, 1.8vw, 1.12rem);
-      color: #D1D5DB;
-      max-width: 620px;
-      margin-bottom: 0.95rem;
-    }
-
-    .hero-sub {
-      font-size: 0.92rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin-bottom: 1.85rem;
-    }
-
-    .btn-volt {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.7rem;
-      padding: 0.9rem 1.65rem;
-      border-radius: 10px;
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 0.86rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      background: var(--accent-volt);
-      color: var(--bg-0);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-    }
-    .btn-volt:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 14px 35px -6px rgba(212, 255, 0, 0.45);
-    }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      padding: 0.88rem 1.4rem;
-      border-radius: 10px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-primary);
-      border: 1px solid var(--line-strong);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-ghost:hover {
-      border-color: var(--accent-volt);
-      color: var(--accent-volt);
-      background: rgba(212, 255, 0, 0.06);
-      transform: translateY(-2px);
-    }
-
-    /* Hero Orbital Centerpiece Card */
-    .orbital-card {
-      background: linear-gradient(160deg, rgba(20, 24, 36, 0.86) 0%, rgba(9, 11, 17, 0.96) 100%);
-      border: 1px solid var(--line-strong);
-      border-radius: 24px;
-      padding: 1.85rem 1.4rem;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75);
-    }
-
-    .orbital-stage {
-      position: relative;
-      width: 176px;
-      height: 176px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.15rem;
-    }
-
-    .orbital-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      animation: spinOrbit 22s linear infinite;
-      pointer-events: none;
-    }
-
-    @keyframes spinOrbit {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .logo-frame {
-      width: 116px;
-      height: 116px;
-      border-radius: 24px;
-      overflow: hidden;
-      border: 2px solid var(--accent-volt);
-      background: linear-gradient(135deg, #161F33, #090C14);
-      box-shadow: 0 0 36px rgba(212, 255, 0, 0.22);
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .orbital-card:hover .logo-frame {
-      transform: scale(1.06) rotate(-2deg);
-    }
-    .logo-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .spec-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      width: 100%;
-      margin-top: 1.15rem;
-      padding-top: 1.15rem;
-      border-top: 1px solid var(--line);
-    }
-
-    .spec-cell {
-      background: rgba(4, 5, 8, 0.7);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 0.6rem 0.35rem;
-    }
-    .spec-val {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 0.82rem;
-      color: var(--text-primary);
-      text-transform: uppercase;
-    }
-    .spec-key {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      color: var(--text-secondary);
-      margin-top: 0.15rem;
-    }
-
-    /* ==========================================================================
-       TECH ARSENAL MARQUEE
-       ========================================================================== */
-    .tech-ribbon {
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      background: rgba(10, 12, 18, 0.88);
-      padding: 1rem 0;
-      overflow: hidden;
-      white-space: nowrap;
-      position: relative;
-      z-index: 10;
-    }
-
-    .tech-track {
-      display: inline-flex;
-      align-items: center;
-      gap: 1.75rem;
-      animation: ribbonScroll 26s linear infinite;
-    }
-
-    @keyframes ribbonScroll {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-50%, 0, 0); }
-    }
-
-    .tech-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.45rem 1rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--line);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-primary);
-    }
-
-    /* ==========================================================================
-       02 // PLAYING-CARD REVOLVING DECK (BULLETPROOF HIT-TESTING ON ALL DEVICES)
-       ========================================================================== */
-    .section-block {
-      padding: 4rem 0;
-      border-bottom: 1px solid var(--line);
-      position: relative;
-    }
-
-    @media (min-width: 768px) {
-      .section-block {
-        padding: 5.5rem 0;
-      }
-    }
-
-    .section-head {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 2rem;
-    }
-
-    @media (min-width: 768px) {
-      .section-head {
-        flex-direction: row;
-        align-items: flex-end;
-        justify-content: space-between;
-      }
-    }
-
-    .sec-index {
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      color: var(--accent-volt);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.3rem;
-    }
-
-    .sec-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(1.85rem, 4vw, 3rem);
-      line-height: 1.04;
-      letter-spacing: -0.03em;
-      text-transform: uppercase;
-    }
-
-    .deck-controls-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .revolve-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--line-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-primary);
-      transition: all 0.25s ease;
-    }
-    .revolve-btn:hover,
-    .revolve-btn:active {
-      background: var(--accent-volt);
-      color: var(--bg-0);
-      border-color: var(--accent-volt);
-      transform: scale(1.06);
-    }
-
-    /* Playing Card Deck Stage — Uses 2D/Perspective-Safe Transforms so Clicks NEVER miss */
-    .playing-deck-viewport {
-      position: relative;
-      width: 100%;
-      height: 540px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: visible;
-      margin: 0.5rem 0 1.75rem;
-      touch-action: pan-y;
-    }
-
-    @media (max-width: 640px) {
-      .playing-deck-viewport {
-        height: 520px;
-      }
-    }
-
-    .playing-deck-ring {
-      position: relative;
-      width: 336px;
-      height: 495px;
-    }
-
-    @media (max-width: 420px) {
-      .playing-deck-ring {
-        width: 296px;
-        height: 470px;
-      }
-    }
-
-    /* Authentic Board-Game / Playing Card Structure */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; background: var(--bg-0); color: var(--text-primary); font-family: var(--font-body); color-scheme: dark; }
+    body { background: var(--bg-0); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; line-height: 1.6; position: relative; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; background: none; border: none; color: inherit; cursor: pointer; }
+    img { max-width: 100%; display: block; }
+    svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+    #ambientCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .stage-blurred-bg { filter: blur(16px) brightness(0.42) !important; transition: filter 0.35s ease; }
+
+    @keyframes motionBlurEnter {
+      0% { opacity: 0; transform: translateY(28px) scale(0.97); filter: blur(14px); }
+      70% { opacity: 1; filter: blur(2px); }
+      100% { opacity: 1; transform: none; filter: none; }
+    }
+    .anim-enter { animation: motionBlurEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .anim-d1 { animation-delay: 0.12s; }
+
+    .wrap { width: 100%; max-width: 1220px; margin: 0 auto; padding: 0 1.15rem; position: relative; z-index: 10; }
+    @media (min-width: 768px) { .wrap { padding: 0 2.25rem; } }
+
+    /* Top Header & Mobile Bottom Dock */
+    .top-header { position: sticky; top: 0; z-index: 30; background: rgba(4, 5, 8, 0.84); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); }
+    .header-row { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 0.75rem; }
+    .brand-mark { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-avatar { width: 42px; height: 42px; border-radius: 11px; overflow: hidden; border: 1.5px solid var(--accent-volt); background: #090C14; flex-shrink: 0; }
+    .brand-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-text { font-family: var(--font-display); font-weight: 800; font-size: 0.98rem; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .alias-pill { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(212, 255, 0, 0.12); color: var(--accent-volt); border: 1px solid rgba(212, 255, 0, 0.3); }
+
+    .desktop-nav { display: none; align-items: center; gap: 0.3rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); padding: 0.28rem; border-radius: 999px; }
+    @media (min-width: 820px) { .desktop-nav { display: flex; } }
+    .nav-item { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: var(--text-secondary); padding: 0.45rem 0.95rem; border-radius: 999px; transition: all 0.25s ease; }
+    .nav-item:hover { color: var(--bg-0); background: var(--accent-volt); font-weight: 700; }
+
+    .availability-badge { font-family: var(--font-mono); font-size: 0.68rem; color: #E2E8F0; display: flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.8rem; border-radius: 999px; border: 1px solid var(--line-strong); background: rgba(255, 255, 255, 0.03); flex-shrink: 0; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-mint); box-shadow: 0 0 10px var(--accent-mint); }
+
+    .mobile-bottom-dock { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 40; display: flex; align-items: center; justify-content: space-around; padding: 0.4rem; border-radius: 999px; background: rgba(10, 12, 18, 0.94); backdrop-filter: blur(20px); border: 1px solid var(--line-strong); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); width: calc(100% - 1.5rem); max-width: 400px; }
+    @media (min-width: 820px) { .mobile-bottom-dock { display: none; } }
+    .dock-link { display: flex; flex-direction: column; align-items: center; gap: 0.18rem; font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; color: var(--text-secondary); padding: 0.38rem 0.65rem; border-radius: 999px; }
+    .dock-link:hover, .dock-link:active { color: var(--accent-volt); background: rgba(212, 255, 0, 0.09); }
+
+    /* Hero Section */
+    .hero-section { padding: 2.75rem 0 3.5rem; }
+    @media (min-width: 768px) { .hero-section { padding: 5rem 0 4.5rem; } }
+    .hero-grid { display: grid; grid-template-columns: 1fr; gap: 2.25rem; align-items: center; }
+    @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.3fr 0.9fr; gap: 3.5rem; } }
+
+    .eyebrow-chip { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.4rem 0.85rem; border: 1px solid var(--line-strong); border-radius: 6px; background: rgba(255, 255, 255, 0.03); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; }
+    .hero-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 0.98; letter-spacing: -0.035em; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .volt-text { color: var(--accent-volt); }
+    .stroke-text { -webkit-text-stroke: 1.5px rgba(248, 250, 252, 0.85); color: transparent; }
+
+    .alias-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-secondary); }
+    .alias-badge { padding: 0.25rem 0.65rem; border-radius: 6px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-strong); color: #fff; font-weight: 700; }
+    .hero-lead { font-size: clamp(0.98rem, 1.8vw, 1.12rem); color: #D1D5DB; max-width: 620px; margin-bottom: 0.95rem; }
+    .hero-sub { font-size: 0.92rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 1.85rem; }
+
+    .btn-volt { display: inline-flex; align-items: center; justify-content: center; gap: 0.7rem; padding: 0.9rem 1.65rem; border-radius: 10px; font-family: var(--font-display); font-weight: 700; font-size: 0.86rem; text-transform: uppercase; background: var(--accent-volt); color: var(--bg-0); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .btn-volt:hover { transform: translateY(-3px); box-shadow: 0 14px 35px -6px rgba(212, 255, 0, 0.45); }
+    .btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.88rem 1.4rem; border-radius: 10px; font-family: var(--font-mono); font-weight: 700; font-size: 0.76rem; text-transform: uppercase; background: rgba(255, 255, 255, 0.04); color: var(--text-primary); border: 1px solid var(--line-strong); transition: all 0.25s ease; }
+    .btn-ghost:hover { border-color: var(--accent-volt); color: var(--accent-volt); }
+
+    .orbital-card { background: linear-gradient(160deg, rgba(20, 24, 36, 0.86) 0%, rgba(9, 11, 17, 0.96) 100%); border: 1px solid var(--line-strong); border-radius: 24px; padding: 1.85rem 1.4rem; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75); }
+    .orbital-stage { position: relative; width: 176px; height: 176px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.15rem; }
+    .orbital-svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: spinOrbit 22s linear infinite; pointer-events: none; }
+    @keyframes spinOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .logo-frame { width: 120px; height: 120px; border-radius: 24px; overflow: hidden; border: 2px solid var(--accent-volt); background: #090C14; box-shadow: 0 0 36px rgba(212, 255, 0, 0.22); position: relative; z-index: 2; }
+    .logo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+    .spec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; width: 100%; margin-top: 1.15rem; padding-top: 1.15rem; border-top: 1px solid var(--line); }
+    .spec-cell { background: rgba(4, 5, 8, 0.7); border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.35rem; }
+    .spec-val { font-family: var(--font-display); font-weight: 800; font-size: 0.82rem; text-transform: uppercase; }
+    .spec-key { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-secondary); margin-top: 0.15rem; }
+
+    /* Tech Stack Marquee */
+    .tech-ribbon { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(10, 12, 18, 0.88); padding: 0.95rem 0; overflow: hidden; white-space: nowrap; position: relative; z-index: 10; }
+    .tech-track { display: inline-flex; align-items: center; gap: 1.5rem; animation: ribbonScroll 24s linear infinite; }
+    @keyframes ribbonScroll { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+    .tech-pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.42rem 0.95rem; border-radius: 999px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.74rem; }
+
+    /* Sections */
+    .section-block { padding: 4rem 0; border-bottom: 1px solid var(--line); position: relative; }
+    @media (min-width: 768px) { .section-block { padding: 5.5rem 0; } }
+    .section-head { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+    @media (min-width: 768px) { .section-head { flex-direction: row; align-items: flex-end; justify-content: space-between; } }
+    .sec-index { font-family: var(--font-mono); font-size: 0.74rem; color: var(--accent-volt); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.3rem; }
+    .sec-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.85rem, 4vw, 3rem); line-height: 1.04; text-transform: uppercase; }
+
+    /* Playing-Card Revolving Deck */
+    .deck-controls-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+    .revolve-btn { width: 46px; height: 46px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+    .revolve-btn:hover, .revolve-btn:active { background: var(--accent-volt); color: var(--bg-0); border-color: var(--accent-volt); transform: scale(1.06); }
+
+    .card-quick-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .quick-tab-btn { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; padding: 0.48rem 0.9rem; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-strong); color: var(--text-secondary); transition: all 0.25s ease; }
+    .quick-tab-btn.active { background: var(--accent-volt); color: var(--bg-0); border-color: var(--accent-volt); font-weight: 700; box-shadow: 0 0 16px rgba(212, 255, 0, 0.35); }
+
+    .playing-deck-viewport { position: relative; width: 100%; height: 535px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0.5rem 0 1.5rem; touch-action: pan-y; }
+    .playing-deck-ring { position: relative; width: 334px; height: 492px; }
+    @media (max-width: 420px) { .playing-deck-ring { width: 292px; height: 468px; } }
+
+    /* Authentic Board-Game / Playing Card Shape (2.5 : 3.5 Portrait Ratio) */
     .playing-card {
       position: absolute;
       top: 0;
@@ -731,9 +423,9 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(160deg, #171D2C 0%, #07090F 55%, #111624 100%);
-      border: 2px solid rgba(255, 255, 255, 0.24);
+      border: 2px solid rgba(255, 255, 255, 0.25);
       border-radius: 24px;
-      padding: 1.3rem 1.2rem;
+      padding: 1.25rem 1.15rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -741,870 +433,195 @@
       user-select: none;
       box-shadow: 0 28px 65px -12px rgba(0, 0, 0, 0.92), inset 0 0 28px rgba(255, 255, 255, 0.03);
       transform-origin: center bottom;
-      transition: 
-        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-        filter 0.35s ease,
-        border-color 0.35s ease,
-        box-shadow 0.45s ease;
+      transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1), filter 0.38s ease, border-color 0.35s ease, box-shadow 0.4s ease;
       overflow: hidden;
     }
+    .playing-card::before { content: ''; position: absolute; inset: 9px; border-radius: 17px; border: 1px solid rgba(255, 255, 255, 0.12); pointer-events: none; z-index: 1; }
 
-    /* Ornamental Inner Playing-Card Frame Border */
-    .playing-card::before {
-      content: '';
-      position: absolute;
-      inset: 9px;
-      border-radius: 17px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      pointer-events: none;
-      z-index: 1;
-      transition: border-color 0.35s ease;
+    /* Continuous Subtle Floating Card Motion on Center Card */
+    @keyframes activeCardFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      50% { transform: translate(0, -7px) rotate(0.4deg) scale(1.012); }
     }
 
-    /* Holographic Foil Sheen */
-    .playing-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        360px circle at var(--cx, 50%) var(--cy, 30%),
-        rgba(255, 255, 255, 0.13),
-        transparent 55%
-      );
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .playing-card:hover::after {
-      opacity: 1;
-    }
-
-    /* Active Suit Glows */
-    .playing-card.suit-hearts[data-pos="0"] {
-      border-color: var(--accent-crimson);
-      box-shadow: 0 30px 80px -14px rgba(255, 46, 84, 0.4), inset 0 0 30px rgba(255, 46, 84, 0.09);
-    }
-    .playing-card.suit-hearts[data-pos="0"]::before {
-      border-color: rgba(255, 46, 84, 0.38);
-    }
-
-    .playing-card.suit-spades[data-pos="0"] {
-      border-color: var(--accent-cobalt);
-      box-shadow: 0 30px 80px -14px rgba(59, 130, 246, 0.4), inset 0 0 30px rgba(59, 130, 246, 0.09);
-    }
-    .playing-card.suit-spades[data-pos="0"]::before {
-      border-color: rgba(59, 130, 246, 0.38);
-    }
-
-    .playing-card.suit-joker[data-pos="0"] {
-      border-color: var(--accent-volt);
-      box-shadow: 0 30px 80px -14px rgba(212, 255, 0, 0.32), inset 0 0 30px rgba(212, 255, 0, 0.08);
-    }
-    .playing-card.suit-joker[data-pos="0"]::before {
-      border-color: rgba(212, 255, 0, 0.38);
-    }
-
-    /* 3-Card Playing Hand / Revolving Fan Positions (No translateZ so mobile touch is 100% accurate!) */
     .playing-card[data-pos="0"] {
       transform: translate(0, 0) rotate(0deg) scale(1);
       opacity: 1;
       z-index: 30;
       filter: none;
     }
+    .playing-card.suit-hearts[data-pos="0"] { border-color: var(--accent-crimson); box-shadow: 0 30px 80px -14px rgba(255, 46, 84, 0.42), inset 0 0 30px rgba(255, 46, 84, 0.1); }
+    .playing-card.suit-spades[data-pos="0"] { border-color: var(--accent-cobalt); box-shadow: 0 30px 80px -14px rgba(59, 130, 246, 0.42), inset 0 0 30px rgba(59, 130, 246, 0.1); }
+    .playing-card.suit-joker[data-pos="0"] { border-color: var(--accent-volt); box-shadow: 0 30px 80px -14px rgba(212, 255, 0, 0.34), inset 0 0 30px rgba(212, 255, 0, 0.08); }
 
     .playing-card[data-pos="1"] {
-      transform: translate(76%, 18px) rotate(9deg) scale(0.86);
+      transform: translate(74%, 18px) rotate(9deg) scale(0.86);
       opacity: 0.68;
       z-index: 20;
-      filter: blur(1.5px) brightness(0.82);
+      filter: blur(2px) brightness(0.8);
     }
-    .playing-card[data-pos="1"]:hover {
-      opacity: 0.92;
-      filter: none;
-      transform: translate(76%, 8px) rotate(7deg) scale(0.89);
-    }
-
     .playing-card[data-pos="-1"] {
-      transform: translate(-76%, 18px) rotate(-9deg) scale(0.86);
+      transform: translate(-74%, 18px) rotate(-9deg) scale(0.86);
       opacity: 0.68;
       z-index: 15;
-      filter: blur(1.5px) brightness(0.82);
+      filter: blur(2px) brightness(0.8);
     }
-    .playing-card[data-pos="-1"]:hover {
-      opacity: 0.92;
-      filter: none;
-      transform: translate(-76%, 8px) rotate(-7deg) scale(0.89);
-    }
-
     @media (max-width: 780px) {
-      .playing-card[data-pos="1"] {
-        transform: translate(22%, 18px) rotate(6deg) scale(0.88);
-        opacity: 0.45;
-      }
-      .playing-card[data-pos="-1"] {
-        transform: translate(-22%, 18px) rotate(-6deg) scale(0.88);
-        opacity: 0.45;
-      }
+      .playing-card[data-pos="1"] { transform: translate(22%, 18px) rotate(6deg) scale(0.88); opacity: 0.48; }
+      .playing-card[data-pos="-1"] { transform: translate(-22%, 18px) rotate(-6deg) scale(0.88); opacity: 0.48; }
     }
 
-    /* Pure CSS Motion-Blur Burst while Revolving & Zooming */
-    .revolving-blur-burst .playing-card {
-      filter: blur(6px) !important;
+    /* Dramatic Motion-Blur Streak when Cards Revolve or Zoom */
+    @keyframes deckSpinMotionBlur {
+      0% { filter: blur(0px); }
+      40% { filter: blur(12px) brightness(1.22); }
+      100% { filter: blur(0px); }
+    }
+    .deck-motion-blur .playing-card {
+      animation: deckSpinMotionBlur 0.46s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    .card-zooming-out {
-      transform: translate(0, -15px) scale(1.18) !important;
-      filter: blur(12px) !important;
+    .card-zoom-burst {
+      transform: translate(0, -16px) scale(1.22) !important;
+      filter: blur(16px) brightness(1.3) !important;
       opacity: 0 !important;
-      transition: all 0.36s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    /* Playing Card Corner Indices */
-    .card-corner-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 3;
-    }
+    .card-corner-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 3; }
+    .card-rank-suit { display: flex; flex-direction: column; align-items: center; line-height: 1; font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
+    .suit-symbol { width: 16px; height: 16px; margin-top: 3px; }
+    .card-class-tag { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line-strong); }
 
-    .card-rank-suit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1;
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.15rem;
-    }
+    .card-center-art { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 0.25rem 0; }
+    .card-medallion { width: 88px; height: 88px; border-radius: 22px; overflow: hidden; border: 2px solid var(--line-strong); background: #080A10; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; }
+    .card-medallion img { width: 100%; height: 100%; object-fit: cover; }
+    .card-project-name { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; color: #fff; line-height: 1.12; text-transform: uppercase; }
+    .card-project-sub { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-secondary); margin: 0.2rem 0 0.65rem; }
+    .card-lore-box { background: rgba(4, 5, 8, 0.82); border: 1px solid var(--line); border-radius: 12px; padding: 0.68rem 0.8rem; font-size: 0.78rem; color: #CBD5E1; line-height: 1.48; margin-bottom: 0.68rem; width: 100%; }
+    .card-stat-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; width: 100%; }
+    .card-pill { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; padding: 0.18rem 0.45rem; border-radius: 5px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); color: #E2E8F0; }
 
-    .suit-symbol {
-      width: 16px;
-      height: 16px;
-      margin-top: 3px;
-    }
+    .card-corner-bottom { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5; padding-top: 0.6rem; border-top: 1px solid var(--line); }
+    .card-action-btn { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; border-radius: 8px; background: var(--accent-volt); color: var(--bg-0); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-action-btn:hover { transform: scale(1.05); box-shadow: 0 0 18px rgba(212, 255, 0, 0.45); }
+    .card-rank-inverted { transform: rotate(180deg); display: flex; flex-direction: column; align-items: center; line-height: 1; font-family: var(--font-display); font-weight: 800; font-size: 1rem; opacity: 0.85; }
 
-    .card-class-tag {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.22rem 0.55rem;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--line-strong);
-      color: #E2E8F0;
-    }
+    .carousel-dots { display: flex; align-items: center; justify-content: center; gap: 0.55rem; margin-top: 0.25rem; }
+    .dot-btn { width: 28px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.18); transition: all 0.3s ease; }
+    .dot-btn.active { width: 48px; background: var(--accent-volt); box-shadow: 0 0 12px rgba(212, 255, 0, 0.5); }
 
-    /* Playing Card Center Artwork Medallion */
-    .card-center-art {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin: 0.25rem 0;
-    }
+    /* Bento Grid & Process Strip */
+    .bento-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 640px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .bento-grid { grid-template-columns: repeat(4, 1fr); } }
+    .bento-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.35s ease, border-color 0.3s ease; }
+    .bento-card:hover { transform: translateY(-5px); border-color: rgba(212, 255, 0, 0.45); }
+    .vector-box { width: 46px; height: 46px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: center; color: var(--accent-volt); margin-bottom: 1.15rem; }
+    .bento-title { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .bento-body { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.58; margin-bottom: 1.15rem; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 0.38rem; }
+    .chip { font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase; padding: 0.22rem 0.52rem; border-radius: 5px; background: rgba(4, 5, 8, 0.85); border: 1px solid var(--line); color: #CBD5E1; }
 
-    .card-medallion {
-      width: 88px;
-      height: 88px;
-      border-radius: 22px;
-      overflow: hidden;
-      border: 2px solid var(--line-strong);
-      background: linear-gradient(135deg, #1B2234, #080A10);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .playing-card:hover .card-medallion {
-      transform: scale(1.07) translateY(-2px);
-    }
-    .card-medallion img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: relative;
-      z-index: 2;
-    }
-    .medallion-fallback {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
+    .process-strip { margin-top: 2.25rem; background: rgba(10, 13, 20, 0.85); border: 1px solid var(--line-strong); border-radius: 22px; padding: 1.65rem; }
+    .process-steps { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.1rem; }
+    @media (min-width: 640px) { .process-steps { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .process-steps { grid-template-columns: repeat(4, 1fr); } }
+    .process-step { background: rgba(4, 5, 8, 0.75); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem; }
 
-    .card-project-name {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.35rem;
-      color: #fff;
-      line-height: 1.12;
-      text-transform: uppercase;
-      letter-spacing: -0.02em;
-    }
+    /* Final Contact & Profiles Section */
+    .connect-box { background: linear-gradient(155deg, rgba(18, 22, 34, 0.92) 0%, rgba(6, 8, 13, 0.98) 100%); border: 1px solid var(--line-strong); border-radius: 28px; padding: 2rem 1.35rem; }
+    @media (min-width: 768px) { .connect-box { padding: 3.25rem; } }
+    .connect-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
+    @media (min-width: 900px) { .connect-grid { grid-template-columns: 1.15fr 0.85fr; gap: 3rem; } }
+    .directory-stack { display: flex; flex-direction: column; gap: 0.85rem; }
+    .channel-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.25rem; border-radius: 16px; background: rgba(4, 5, 8, 0.88); border: 1px solid var(--line-strong); transition: all 0.25s ease; }
+    .channel-card:hover { border-color: var(--accent-volt); transform: translateX(5px); background: rgba(212, 255, 0, 0.05); }
+    .channel-left { display: flex; align-items: center; gap: 0.9rem; }
+    .channel-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--accent-volt); flex-shrink: 0; }
 
-    .card-project-sub {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--text-secondary);
-      margin-top: 0.2rem;
-      margin-bottom: 0.65rem;
-    }
-
-    .card-lore-box {
-      background: rgba(4, 5, 8, 0.82);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 0.7rem 0.8rem;
-      font-size: 0.79rem;
-      color: #CBD5E1;
-      line-height: 1.48;
-      margin-bottom: 0.7rem;
-      width: 100%;
-    }
-
-    .card-stat-pills {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.32rem;
-      width: 100%;
-    }
-
-    .card-pill {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      text-transform: uppercase;
-      padding: 0.18rem 0.46rem;
-      border-radius: 5px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line);
-      color: #E2E8F0;
-    }
-
-    /* Playing Card Bottom Action Button & Inverted Corner Rank */
-    .card-corner-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 5;
-      padding-top: 0.65rem;
-      border-top: 1px solid var(--line);
-    }
-
-    .card-action-btn {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.42rem 0.8rem;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--line-strong);
-      color: var(--accent-volt);
-      transition: all 0.2s ease;
-    }
-    .playing-card:hover .card-action-btn {
-      background: var(--accent-volt);
-      color: var(--bg-0);
-      border-color: var(--accent-volt);
-    }
-
-    .card-rank-inverted {
-      transform: rotate(180deg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1;
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1rem;
-      opacity: 0.85;
-    }
-
-    /* Quick Card Selector Tabs + Dots */
-    .card-quick-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      margin-top: 0.5rem;
-    }
-
-    .quick-tab-btn {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line-strong);
-      color: var(--text-secondary);
-      transition: all 0.25s ease;
-    }
-    .quick-tab-btn.active {
-      background: var(--accent-volt);
-      color: var(--bg-0);
-      border-color: var(--accent-volt);
-      font-weight: 700;
-      box-shadow: 0 0 18px rgba(212, 255, 0, 0.35);
-    }
-
-    /* ==========================================================================
-       03 // SKILLS & ENGINEERING CAPABILITIES BENTO GRID
-       ========================================================================== */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-
-    @media (min-width: 640px) {
-      .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .bento-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .bento-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 1.6rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-    }
-    .bento-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(212, 255, 0, 0.45);
-    }
-
-    .vector-box {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-volt);
-      margin-bottom: 1.2rem;
-    }
-
-    .bento-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: #fff;
-      margin-bottom: 0.5rem;
-    }
-
-    .bento-body {
-      font-size: 0.86rem;
-      color: var(--text-secondary);
-      line-height: 1.58;
-      margin-bottom: 1.15rem;
-    }
-
-    .chip-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.38rem;
-    }
-
-    .chip {
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      text-transform: uppercase;
-      padding: 0.22rem 0.52rem;
-      border-radius: 5px;
-      background: rgba(4, 5, 8, 0.85);
-      border: 1px solid var(--line);
-      color: #CBD5E1;
-    }
-
-    .process-strip {
-      margin-top: 2.25rem;
-      background: rgba(10, 13, 20, 0.85);
-      border: 1px solid var(--line-strong);
-      border-radius: 22px;
-      padding: 1.65rem;
-    }
-
-    .process-steps {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      margin-top: 1.1rem;
-    }
-
-    @media (min-width: 640px) {
-      .process-steps {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .process-steps {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .process-step {
-      background: rgba(4, 5, 8, 0.75);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 1.1rem;
-      transition: border-color 0.25s ease;
-    }
-    .process-step:hover {
-      border-color: var(--accent-volt);
-    }
-
-    /* ==========================================================================
-       04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & DIRECT CONTACT
-       ========================================================================== */
-    .connect-box {
-      background: linear-gradient(155deg, rgba(18, 22, 34, 0.92) 0%, rgba(6, 8, 13, 0.98) 100%);
-      border: 1px solid var(--line-strong);
-      border-radius: 28px;
-      padding: 2rem 1.35rem;
-    }
-
-    @media (min-width: 768px) {
-      .connect-box {
-        padding: 3.25rem;
-      }
-    }
-
-    .connect-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    @media (min-width: 900px) {
-      .connect-grid {
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 3rem;
-      }
-    }
-
-    .directory-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .channel-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 1.1rem 1.25rem;
-      border-radius: 16px;
-      background: rgba(4, 5, 8, 0.88);
-      border: 1px solid var(--line-strong);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .channel-card:hover {
-      border-color: var(--accent-volt);
-      transform: translateX(6px);
-      background: rgba(212, 255, 0, 0.05);
-    }
-
-    .channel-left {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-    }
-
-    .channel-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-volt);
-      flex-shrink: 0;
-    }
-
-    /* ==========================================================================
-       FULLSCREEN ZOOM-IN PROJECT TAKEOVER MODAL
-       ========================================================================== */
+    /* Fullscreen Zoom Takeover Modal (Supports BOTH JS .is-open AND pure CSS :target!) */
     .takeover-backdrop {
       position: fixed;
       inset: 0;
       z-index: 100;
       background: rgba(3, 4, 8, 0.92);
-      backdrop-filter: blur(26px) saturate(180%);
-      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      backdrop-filter: blur(26px);
+      -webkit-backdrop-filter: blur(26px);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 0;
     }
-
-    @media (min-width: 768px) {
-      .takeover-backdrop {
-        padding: 1.5rem;
-      }
-    }
-
-    .takeover-backdrop.is-open {
-      display: flex;
+    @media (min-width: 768px) { .takeover-backdrop { padding: 1.5rem; } }
+    .takeover-backdrop.is-open,
+    .takeover-backdrop:target {
+      display: flex !important;
     }
 
     @keyframes modalZoomBlurIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.82) translateY(28px);
-        filter: blur(18px);
-      }
-      70% {
-        opacity: 1;
-        filter: blur(2px);
-      }
-      100% {
-        opacity: 1;
-        transform: none;
-        filter: none;
-      }
+      0% { opacity: 0; transform: scale(0.78) translateY(32px); filter: blur(22px); }
+      65% { opacity: 1; filter: blur(3px); }
+      100% { opacity: 1; transform: none; filter: none; }
     }
+    .takeover-panel { width: 100%; height: 100vh; max-width: 1100px; overflow-y: auto; background: linear-gradient(165deg, #101420 0%, #06080E 100%); border: 1px solid var(--line-strong); padding: 1.5rem 1.25rem 3.5rem; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95); animation: modalZoomBlurIn 0.46s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    @media (min-width: 768px) { .takeover-panel { height: auto; max-height: 90vh; border-radius: 28px; padding: 2.5rem; } }
 
-    .takeover-panel {
-      width: 100%;
-      height: 100vh;
-      max-width: 1120px;
-      overflow-y: auto;
-      background: linear-gradient(165deg, #101420 0%, #06080E 100%);
-      border: 1px solid var(--line-strong);
-      padding: 1.5rem 1.25rem 3.5rem;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95);
-      animation: modalZoomBlurIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
+    .takeover-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; position: sticky; top: -1.5rem; background: rgba(10, 13, 22, 0.95); backdrop-filter: blur(16px); z-index: 10; padding-top: 0.5rem; }
+    .close-takeover-btn { display: inline-flex; align-items: center; gap: 0.45rem; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; padding: 0.6rem 1.1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--line-strong); color: #fff; flex-shrink: 0; }
+    .close-takeover-btn:hover { background: var(--accent-crimson); border-color: var(--accent-crimson); }
 
-    @media (min-width: 768px) {
-      .takeover-panel {
-        height: auto;
-        max-height: 90vh;
-        border-radius: 28px;
-        padding: 2.5rem;
-      }
-    }
+    .work-logo { width: 56px; height: 56px; border-radius: 14px; overflow: hidden; border: 1.5px solid var(--line-strong); background: var(--bg-0); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .work-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .work-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 5px; margin-bottom: 0.25rem; }
+    .badge-crimson { background: rgba(255, 46, 84, 0.15); color: #FF8096; border: 1px solid rgba(255, 46, 84, 0.38); }
+    .badge-cobalt { background: rgba(59, 130, 246, 0.15); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.38); }
+    .badge-volt { background: rgba(212, 255, 0, 0.14); color: var(--accent-volt); border: 1px solid rgba(212, 255, 0, 0.35); }
+    .work-quote { font-family: var(--font-mono); font-size: 0.78rem; color: #E2E8F0; padding: 0.75rem 1rem; background: rgba(4, 5, 8, 0.8); border-left: 3px solid var(--accent-volt); border-radius: 0 8px 8px 0; margin-bottom: 1.4rem; }
 
-    .takeover-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 1.5rem;
-      position: sticky;
-      top: -1.5rem;
-      background: rgba(10, 13, 22, 0.94);
-      backdrop-filter: blur(18px);
-      z-index: 10;
-      padding-top: 0.5rem;
-    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.65rem; }
+    @media (min-width: 640px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+    .kpi-box { background: rgba(4, 5, 8, 0.85); border: 1px solid var(--line); border-radius: 14px; padding: 1rem; text-align: center; }
+    .kpi-num { font-family: var(--font-display); font-weight: 800; font-size: 1.45rem; color: #fff; }
+    .kpi-lbl { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); margin-top: 0.2rem; }
 
-    .close-takeover-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      padding: 0.6rem 1.1rem;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--line-strong);
-      color: #fff;
-      flex-shrink: 0;
-      transition: all 0.2s ease;
-    }
-    .close-takeover-btn:hover {
-      background: var(--accent-crimson);
-      border-color: var(--accent-crimson);
-    }
+    .arch-flow { background: rgba(4, 5, 8, 0.9); border: 1px solid var(--line-strong); border-radius: 18px; padding: 1.25rem; margin-bottom: 1.65rem; }
+    .arch-nodes { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-top: 1rem; }
+    @media (min-width: 640px) { .arch-nodes { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 920px) { .arch-nodes { grid-template-columns: repeat(4, 1fr); } }
+    .arch-node { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.95rem; }
 
-    .work-logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1.5px solid var(--line-strong);
-      background: var(--bg-0);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .work-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: relative;
-      z-index: 2;
-    }
+    .module-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.65rem; }
+    @media (min-width: 680px) { .module-grid { grid-template-columns: repeat(2, 1fr); } }
+    .module-box { background: rgba(17, 21, 32, 0.88); border: 1px solid var(--line); border-radius: 16px; padding: 1.25rem; }
+    .module-tag { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-volt); text-transform: uppercase; margin-bottom: 0.35rem; }
+    .module-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: #fff; margin-bottom: 0.45rem; }
+    .module-desc { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.58; }
 
-    .work-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      padding: 0.2rem 0.55rem;
-      border-radius: 5px;
-      margin-bottom: 0.25rem;
-    }
+    .ext-links-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+    @media (min-width: 600px) { .ext-links-grid { grid-template-columns: repeat(2, 1fr); } }
+    .ext-link-card { display: flex; align-items: center; justify-content: space-between; padding: 0.95rem 1.15rem; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-strong); font-family: var(--font-mono); font-size: 0.75rem; transition: all 0.2s ease; }
+    .ext-link-card:hover { border-color: var(--accent-volt); background: rgba(212, 255, 0, 0.08); }
 
-    .badge-crimson {
-      background: rgba(255, 46, 84, 0.15);
-      color: #FF8096;
-      border: 1px solid rgba(255, 46, 84, 0.38);
-    }
-
-    .badge-cobalt {
-      background: rgba(59, 130, 246, 0.15);
-      color: #93C5FD;
-      border: 1px solid rgba(59, 130, 246, 0.38);
-    }
-
-    .badge-volt {
-      background: rgba(212, 255, 0, 0.14);
-      color: var(--accent-volt);
-      border: 1px solid rgba(212, 255, 0, 0.35);
-    }
-
-    .work-quote {
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      color: #E2E8F0;
-      padding: 0.75rem 1rem;
-      background: rgba(4, 5, 8, 0.8);
-      border-left: 3px solid var(--accent-volt);
-      border-radius: 0 8px 8px 0;
-      margin-bottom: 1.4rem;
-    }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.65rem;
-    }
-
-    @media (min-width: 640px) {
-      .kpi-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .kpi-box {
-      background: rgba(4, 5, 8, 0.85);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 1rem;
-      text-align: center;
-    }
-    .kpi-num {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.45rem;
-      color: #fff;
-    }
-    .kpi-lbl {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      margin-top: 0.2rem;
-    }
-
-    .arch-flow {
-      background: rgba(4, 5, 8, 0.9);
-      border: 1px solid var(--line-strong);
-      border-radius: 18px;
-      padding: 1.25rem;
-      margin-bottom: 1.65rem;
-    }
-
-    .arch-nodes {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-
-    @media (min-width: 640px) {
-      .arch-nodes {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 920px) {
-      .arch-nodes {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .arch-node {
-      background: var(--bg-2);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 0.95rem;
-      transition: border-color 0.25s ease, transform 0.25s ease;
-    }
-    .arch-node:hover {
-      border-color: var(--accent-volt);
-      transform: translateY(-3px);
-    }
-
-    .module-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      margin-bottom: 1.65rem;
-    }
-
-    @media (min-width: 680px) {
-      .module-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .module-box {
-      background: rgba(17, 21, 32, 0.88);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 1.25rem;
-    }
-
-    .module-tag {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--accent-volt);
-      text-transform: uppercase;
-      margin-bottom: 0.35rem;
-    }
-
-    .module-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #fff;
-      margin-bottom: 0.45rem;
-    }
-
-    .module-desc {
-      font-size: 0.84rem;
-      color: var(--text-secondary);
-      line-height: 1.58;
-    }
-
-    .ext-links-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-
-    @media (min-width: 600px) {
-      .ext-links-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .ext-link-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.95rem 1.15rem;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line-strong);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      transition: all 0.25s ease;
-    }
-    .ext-link-card:hover {
-      border-color: var(--accent-volt);
-      background: rgba(212, 255, 0, 0.08);
-      transform: translateY(-2px);
-    }
-
-    .site-footer {
-      padding: 2.5rem 0 6rem;
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      color: var(--text-muted);
-    }
-
-    @media (min-width: 820px) {
-      .site-footer {
-        padding: 2.5rem 0;
-      }
-    }
+    .site-footer { padding: 2.5rem 0 6rem; font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-muted); }
+    @media (min-width: 820px) { .site-footer { padding: 2.5rem 0; } }
   </style>
 </head>
 <body>
 
-  <!-- Subtle Studio Film Grain -->
-  <div class="noise-overlay"></div>
-
-  <!-- Custom Desktop Cursor Ring -->
-  <div id="cursorRing" class="cursor-ring"></div>
-
   <!-- Smooth Glowing Constellation + Aurora Orbs Canvas -->
   <canvas id="ambientCanvas"></canvas>
 
-  <!-- TOP MINIMAL HEADER -->
+  <!-- TOP MINIMAL HEADER (Direct Logo Image — Zero "RS" Text Overlay!) -->
   <header class="top-header">
     <div class="wrap header-row">
       <a href="#intro" class="brand-mark">
         <div class="brand-avatar">
-          <!-- Loaded via Global CDN Proxy (wsrv.nl / i0.wp.com) so Indian ISPs never block i.ibb.co! -->
           <img 
-            class="smart-img"
-            src="https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
-            data-wp="https://i0.wp.com/i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
-            data-raw="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
-            alt="Rishabh Singh Logo" 
-            referrerpolicy="no-referrer"
+            src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
+            alt="Rishabh Singh" 
+            onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png';}"
           />
-          <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-volt); font-size:0.9rem;">RS</div>
         </div>
         <div class="brand-text">
           <span>Rishabh Singh</span>
@@ -1629,19 +646,19 @@
   <!-- MOBILE FLOATING BOTTOM NAVIGATION DOCK -->
   <nav class="mobile-bottom-dock" aria-label="Mobile Navigation">
     <a href="#intro" class="dock-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>About</span>
     </a>
     <a href="#work" class="dock-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
       <span>Projects</span>
     </a>
     <a href="#capabilities" class="dock-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
       <span>Skills</span>
     </a>
     <a href="#connect" class="dock-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       <span>Contact</span>
     </a>
   </nav>
@@ -1650,15 +667,12 @@
   <div id="motionStage">
     <main>
 
-      <!-- =================================================================
-           01 // PERSONAL INTRODUCTION
-           ================================================================= -->
+      <!-- 01 // PERSONAL INTRODUCTION -->
       <section id="intro" class="hero-section">
         <div class="wrap hero-grid">
-          
           <div class="anim-enter">
             <div class="eyebrow-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
               <span>18 Y/O FULL-STACK &amp; BOT DEVELOPER // INDIA</span>
             </div>
 
@@ -1680,44 +694,37 @@
             </p>
 
             <p class="hero-sub">
-              I engineer every layer end-to-end—responsive frontend interfaces, backend APIs, databases, encrypted cloud storage, and multi-server AI moderation. I combine modern AI tools with months of deep manual systems engineering, security hardening, and stress-testing so my systems can handle thousands of concurrent users without breaking.
+              I engineer every layer end-to-end—responsive frontend interfaces, backend APIs, databases, encrypted cloud storage, and multi-server AI moderation. I combine modern AI tools with months of deep manual systems engineering, security hardening, and stress-testing so my systems handle thousands of concurrent users smoothly.
             </p>
 
             <div style="display:flex; flex-wrap:wrap; gap:0.85rem; align-items:center;">
               <a href="#work" class="btn-volt">
                 <span>See the Projects I Built</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>
               </a>
               <a href="#capabilities" class="btn-ghost">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                 <span>What I Build &amp; Master</span>
               </a>
             </div>
           </div>
 
-          <!-- Right Orbital Identity Showcase -->
+          <!-- Right Orbital Identity Showcase (Direct Logo Image — Zero "RS" Text!) -->
           <div class="anim-enter anim-d1">
             <div class="orbital-card">
               <div class="orbital-stage">
-                <svg class="orbital-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="orbital-svg" viewBox="0 0 200 200" fill="none">
                   <circle cx="100" cy="100" r="92" stroke="rgba(212,255,0,0.25)" stroke-width="1.2" stroke-dasharray="6 8" />
                   <circle cx="100" cy="100" r="76" stroke="rgba(59,130,246,0.28)" stroke-width="1.2" stroke-dasharray="18 10" />
                   <circle cx="100" cy="8" r="4.5" fill="#D4FF00" />
                   <circle cx="176" cy="100" r="4" fill="#3B82F6" />
                 </svg>
 
-                <div class="logo-frame" title="Rishabh Singh Official Logo">
+                <div class="logo-frame">
                   <img 
-                    class="smart-img"
-                    src="https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
-                    data-wp="https://i0.wp.com/i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
-                    data-raw="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png"
+                    src="https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png" 
                     alt="Rishabh Singh Official Logo" 
-                    referrerpolicy="no-referrer"
+                    onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/QvkZgMzn/file-0000000004c48207bdf946515f09e371.png';}"
                   />
-                  <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; font-size:2.1rem; color:var(--accent-volt);">
-                    RS
-                  </div>
                 </div>
               </div>
 
@@ -1747,64 +754,28 @@
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
       <!-- TECH STACK RIBBON -->
       <div class="tech-ribbon" aria-hidden="true">
-        <div class="tech-track" id="techTrack">
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span>JavaScript / ES6+</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            <span>Node.js &amp; Backend APIs</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-            <span>Python &amp; Bot Engines</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2E54" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-            <span>Google Firebase Realtime</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <span>HTML5 &amp; Mini WebApps</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Encrypted Cloud Storage</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Multi-Server AI Pipelines</span>
-          </span>
-          <!-- Duplicate for seamless loop -->
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span>JavaScript / ES6+</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            <span>Node.js &amp; Backend APIs</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-            <span>Python &amp; Bot Engines</span>
-          </span>
-          <span class="tech-pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2E54" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-            <span>Google Firebase Realtime</span>
-          </span>
+        <div class="tech-track">
+          <span class="tech-pill">JavaScript / ES6+</span>
+          <span class="tech-pill">Node.js &amp; Backend APIs</span>
+          <span class="tech-pill">Python &amp; Bot Engines</span>
+          <span class="tech-pill">Google Firebase Realtime</span>
+          <span class="tech-pill">HTML5 &amp; Mini WebApps</span>
+          <span class="tech-pill">Encrypted Cloud Storage</span>
+          <span class="tech-pill">Multi-Server AI Pipelines</span>
+          <span class="tech-pill">JavaScript / ES6+</span>
+          <span class="tech-pill">Node.js &amp; Backend APIs</span>
+          <span class="tech-pill">Python &amp; Bot Engines</span>
+          <span class="tech-pill">Google Firebase Realtime</span>
+          <span class="tech-pill">HTML5 &amp; Mini WebApps</span>
         </div>
       </div>
 
-      <!-- =================================================================
-           02 // PROJECTS I BUILT — PLAYING-CARD SHAPED REVOLVING 3-CARD DECK
-           ================================================================= -->
+      <!-- 02 // PROJECTS I BUILT — PLAYING-CARD REVOLVING DECK -->
       <section id="work" class="section-block">
         <div class="wrap">
           <div class="section-head">
@@ -1813,85 +784,64 @@
               <h2 class="sec-title">Projects I Built</h2>
             </div>
             <p style="font-size:0.94rem; color:var(--text-secondary); max-width:490px;">
-              Browse my project cards below. <strong style="color:#fff;">Click on any card</strong> to bring it up close and explore its full functionality, architecture, and live links.
+              Cards automatically revolve with motion blur. <strong style="color:#fff;">Click on any card</strong> (or use the buttons below) to zoom it open into full-screen details.
             </p>
           </div>
 
-          <!-- Deck Navigation Controls -->
           <div class="deck-controls-bar">
             <div style="display:flex; align-items:center; gap:0.65rem;">
-              <button type="button" id="prevCardBtn" onclick="stepCarousel(-1); startAutoRevolve();" class="revolve-btn" aria-label="Previous Project Card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              <button type="button" id="prevCardBtn" onclick="window.stepDeck(-1); window.restartAutoDeck();" class="revolve-btn" aria-label="Previous Card">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-              <button type="button" id="nextCardBtn" onclick="stepCarousel(1); startAutoRevolve();" class="revolve-btn" aria-label="Next Project Card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <button type="button" id="nextCardBtn" onclick="window.stepDeck(1); window.restartAutoDeck();" class="revolve-btn" aria-label="Next Card">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
-              <button type="button" id="toggleAutoRevolveBtn" onclick="toggleAutoCycle();" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                <span id="autoRevolveLabel">Auto-Cycle: ON</span>
+              <button type="button" id="toggleAutoRevolveBtn" onclick="window.toggleDeckAuto();" class="btn-ghost" style="padding:0.55rem 0.95rem; font-size:0.7rem;">
+                <span id="autoRevolveLabel">Auto-Revolve: ON</span>
               </button>
             </div>
 
-            <!-- Direct Card Switcher Pills -->
             <div class="card-quick-tabs">
-              <button type="button" class="quick-tab-btn active" data-goto="0" onclick="selectCardDirect(0)">A♥ Date Anyone Bot</button>
-              <button type="button" class="quick-tab-btn" data-goto="1" onclick="selectCardDirect(1)">K♠ Command Hub</button>
-              <button type="button" class="quick-tab-btn" data-goto="2" onclick="selectCardDirect(2)">★ More &amp; Client Work</button>
+              <button type="button" class="quick-tab-btn active" onclick="window.jumpToCard(0)">A♥ Date Anyone Bot</button>
+              <button type="button" class="quick-tab-btn" onclick="window.jumpToCard(1)">K♠ Command Hub</button>
+              <button type="button" class="quick-tab-btn" onclick="window.jumpToCard(2)">★ More &amp; Client Work</button>
             </div>
           </div>
 
-          <!-- PLAYING-CARD PROPORTIONED REVOLVING STAGE -->
+          <!-- PLAYING-CARD 3-CARD REVOLVING RING -->
           <div class="playing-deck-viewport" id="revolveViewport">
             <div class="playing-deck-ring" id="revolveRing">
 
-              <!-- =========================================================
-                   PLAYING CARD 1 (ACE OF HEARTS): DATE ANYONE ROBOT
-                   ========================================================= -->
-              <article 
+              <!-- CARD 1: DATE ANYONE ROBOT -->
+              <a 
+                href="#takeover-datebot"
                 class="playing-card suit-hearts" 
                 data-index="0" 
                 data-pos="0" 
-                data-target="datebot"
                 id="revolveCard0"
-                onclick="handleCardClick(0, 'datebot')"
-                role="button"
-                tabindex="0"
-                aria-label="Date Anyone Robot — Click to view full project details"
+                onclick="window.openCardModal(0, 'datebot', event)"
               >
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-crimson);">
                     <span>A</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                   </div>
-                  <span class="card-class-tag" style="border-color:rgba(255,46,84,0.4); color:#FF8096;">
-                    7,000+ USERS
-                  </span>
+                  <span class="card-class-tag" style="border-color:rgba(255,46,84,0.4); color:#FF8096;">7,000+ USERS</span>
                 </div>
 
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-crimson);">
                     <img 
-                      class="smart-img"
-                      src="https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
-                      data-wp="https://i0.wp.com/i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
-                      data-raw="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
-                      alt="Date Anyone Robot Logo" 
-                      referrerpolicy="no-referrer"
+                      src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+                      alt="Date Anyone Robot" 
+                      onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg';}"
                     />
-                    <div class="medallion-fallback" style="color:var(--accent-crimson);">
-                      <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    </div>
                   </div>
-
                   <h3 class="card-project-name">Date Anyone Robot</h3>
                   <div class="card-project-sub">t.me/DateanyoneRobot</div>
-
                   <div class="card-lore-box">
-                    Social discovery &amp; real-time chat bot with <strong style="color:#fff;">7,000+ users</strong> &amp; <strong style="color:#fff;">11,000+ encrypted photos</strong>. Profile matching engine, RAM chat queue, 2 AI moderation servers &amp; Mini Web App.
+                    Social discovery &amp; real-time chat bot with <strong style="color:#fff;">7,000+ users</strong> &amp; <strong style="color:#fff;">11,000+ encrypted photos</strong>. Profile matching, RAM chat queue, 2 AI moderation servers &amp; Mini Web App.
                   </div>
-
                   <div class="card-stat-pills">
                     <span class="card-pill">2 AI Servers</span>
                     <span class="card-pill">RAM Queue</span>
@@ -1901,67 +851,47 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard0', 'datebot');">
-                    <span>Open Full Details</span>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </button>
+                  <span class="card-action-btn">
+                    <span>Open Card Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </span>
                   <div class="card-rank-inverted" style="color:var(--accent-crimson);">
                     <span>A</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                   </div>
                 </div>
-              </article>
+              </a>
 
-              <!-- =========================================================
-                   PLAYING CARD 2 (KING OF SPADES): COMMAND HUB
-                   ========================================================= -->
-              <article 
+              <!-- CARD 2: COMMAND HUB -->
+              <a 
+                href="#takeover-cmdhub"
                 class="playing-card suit-spades" 
                 data-index="1" 
                 data-pos="1" 
-                data-target="cmdhub"
                 id="revolveCard1"
-                onclick="handleCardClick(1, 'cmdhub')"
-                role="button"
-                tabindex="0"
-                aria-label="Command Hub — Click to view full project details"
+                onclick="window.openCardModal(1, 'cmdhub', event)"
               >
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-cobalt);">
                     <span>K</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/></svg>
                   </div>
-                  <span class="card-class-tag" style="border-color:rgba(59,130,246,0.4); color:#93C5FD;">
-                    GROUP MANAGER
-                  </span>
+                  <span class="card-class-tag" style="border-color:rgba(59,130,246,0.4); color:#93C5FD;">GROUP MANAGER</span>
                 </div>
 
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-cobalt);">
                     <img 
-                      class="smart-img"
-                      src="https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
-                      data-wp="https://i0.wp.com/i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
-                      data-raw="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
-                      alt="Command Hub Logo" 
-                      referrerpolicy="no-referrer"
+                      src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+                      alt="Command Hub" 
+                      onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg';}"
                     />
-                    <div class="medallion-fallback" style="color:var(--accent-cobalt);">
-                      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
                   </div>
-
                   <h3 class="card-project-name">COMMAND HUB</h3>
                   <div class="card-project-sub">t.me/CommandHUBRoBOT</div>
-
                   <div class="card-lore-box">
-                    Moderate, manage &amp; entertain Telegram groups. Features web settings, CAPTCHA, scheduled group close/open locks, bio-link scanner, sticker whitelist &amp; 7+ games.
+                    Moderate, manage &amp; entertain Telegram groups. Web settings, CAPTCHA, scheduled group close/open locks, bio-link scanner, sticker whitelist &amp; 7+ games.
                   </div>
-
                   <div class="card-stat-pills">
                     <span class="card-pill">Bio-Link Scan</span>
                     <span class="card-pill">Timed Locks</span>
@@ -1971,57 +901,43 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard1', 'cmdhub');">
-                    <span>Open Full Details</span>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </button>
+                  <span class="card-action-btn">
+                    <span>Open Card Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </span>
                   <div class="card-rank-inverted" style="color:var(--accent-cobalt);">
                     <span>K</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
-                      <path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;"><path d="M12 2C7 8 4 11.5 4 14.5C4 17.5 6.5 19.5 9 19.5C10.3 19.5 11.2 19 11.5 18.5L10 22H14L12.5 18.5C12.8 19 13.7 19.5 15 19.5C17.5 19.5 20 17.5 20 14.5C20 11.5 17 8 12 2Z"/></svg>
                   </div>
                 </div>
-              </article>
+              </a>
 
-              <!-- =========================================================
-                   PLAYING CARD 3 (WILD STAR): MORE PROJECTS & CLIENT WORK
-                   ========================================================= -->
-              <article 
+              <!-- CARD 3: MORE PROJECTS & CLIENT BUILDS -->
+              <a 
+                href="#takeover-morework"
                 class="playing-card suit-joker" 
                 data-index="2" 
                 data-pos="-1" 
-                data-target="morework"
                 id="revolveCard2"
-                onclick="handleCardClick(2, 'morework')"
-                role="button"
-                tabindex="0"
-                aria-label="More Projects and Custom Client Builds — Click to view details"
+                onclick="window.openCardModal(2, 'morework', event)"
               >
                 <div class="card-corner-top">
                   <div class="card-rank-suit" style="color:var(--accent-volt);">
                     <span>★</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/></svg>
                   </div>
-                  <span class="card-class-tag" style="border-color:rgba(212,255,0,0.4); color:var(--accent-volt);">
-                    GROWING DECK
-                  </span>
+                  <span class="card-class-tag" style="border-color:rgba(212,255,0,0.4); color:var(--accent-volt);">GROWING DECK</span>
                 </div>
 
                 <div class="card-center-art">
                   <div class="card-medallion" style="border-color:var(--accent-volt); color:var(--accent-volt);">
-                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                   </div>
-
                   <h3 class="card-project-name">More &amp; Client Builds</h3>
                   <div class="card-project-sub">Custom Projects by Trivioner</div>
-
                   <div class="card-lore-box">
                     More of my projects will keep being added to this card deck as I build them. I also engineer custom full-stack websites, Telegram bots, and scalable systems for clients.
                   </div>
-
                   <div class="card-stat-pills">
                     <span class="card-pill">Client Projects</span>
                     <span class="card-pill">Full-Stack Web</span>
@@ -2031,35 +947,29 @@
                 </div>
 
                 <div class="card-corner-bottom">
-                  <button type="button" class="card-action-btn" onclick="event.stopPropagation(); zoomAndOpen('revolveCard2', 'morework');">
-                    <span>Open Full Details</span>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                  </button>
+                  <span class="card-action-btn">
+                    <span>Open Card Details</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  </span>
                   <div class="card-rank-inverted" style="color:var(--accent-volt);">
                     <span>★</span>
-                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;">
-                      <path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/>
-                    </svg>
+                    <svg class="suit-symbol" viewBox="0 0 24 24" fill="currentColor" style="width:13px; height:13px;"><path d="M12 2L14.8 8.5L22 9.3L16.5 14L18.2 21L12 17.3L5.8 21L7.5 14L2 9.3L9.2 8.5L12 2Z"/></svg>
                   </div>
                 </div>
-              </article>
+              </a>
 
             </div>
           </div>
 
-          <!-- 3 Indicator Dots -->
           <div class="carousel-dots">
-            <button type="button" class="dot-btn active" data-goto="0" onclick="selectCardDirect(0)" aria-label="Date Anyone Robot Card"></button>
-            <button type="button" class="dot-btn" data-goto="1" onclick="selectCardDirect(1)" aria-label="Command Hub Card"></button>
-            <button type="button" class="dot-btn" data-goto="2" onclick="selectCardDirect(2)" aria-label="More Projects and Client Work Card"></button>
+            <button type="button" class="dot-btn active" onclick="window.jumpToCard(0)" aria-label="Card 1"></button>
+            <button type="button" class="dot-btn" onclick="window.jumpToCard(1)" aria-label="Card 2"></button>
+            <button type="button" class="dot-btn" onclick="window.jumpToCard(2)" aria-label="Card 3"></button>
           </div>
-
         </div>
       </section>
 
-      <!-- =================================================================
-           03 // WHAT I BUILD & MASTER
-           ================================================================= -->
+      <!-- 03 // WHAT I BUILD & MASTER -->
       <section id="capabilities" class="section-block">
         <div class="wrap">
           <div class="section-head">
@@ -2076,7 +986,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                 </div>
                 <h3 class="bento-title">Full-Stack Websites</h3>
                 <p class="bento-body">
@@ -2093,7 +1003,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-cobalt);">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
                 </div>
                 <h3 class="bento-title">Telegram Bots &amp; Mini Apps</h3>
                 <p class="bento-body">
@@ -2110,7 +1020,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-crimson);">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
                 <h3 class="bento-title">AI Moderation &amp; Smart Filters</h3>
                 <p class="bento-body">
@@ -2127,7 +1037,7 @@
             <div class="bento-card">
               <div>
                 <div class="vector-box" style="color:var(--accent-mint);">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 </div>
                 <h3 class="bento-title">Built to Handle Thousands of Users</h3>
                 <p class="bento-body">
@@ -2169,18 +1079,14 @@
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-      <!-- =================================================================
-           04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & CONTACT ME
-           ================================================================= -->
+      <!-- 04 // FINAL SECTION: GITHUB (IMAROP), UPDATES CHANNEL & CONTACT ME -->
       <section id="connect" class="section-block" style="border-bottom:none;">
         <div class="wrap">
           <div class="connect-box">
             <div class="connect-grid">
-              
               <div>
                 <div class="sec-index">03 // GET IN TOUCH &amp; LINKS</div>
                 <h2 class="sec-title" style="margin-bottom:0.85rem;">
@@ -2192,7 +1098,7 @@
 
                 <div style="display:flex; flex-wrap:wrap; gap:0.85rem;">
                   <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="btn-volt">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     <span>Contact Me on Telegram</span>
                   </a>
                   <a href="https://github.com/imarop" target="_blank" rel="noopener noreferrer" class="btn-ghost">
@@ -2206,27 +1112,27 @@
                 <a href="https://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
                     <div class="channel-icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
                     <div>
                       <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Direct Contact (Trivioner)</div>
                       <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://t.me/Trivioner?direct</div>
                     </div>
                   </div>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4FF00" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
 
                 <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="channel-card">
                   <div class="channel-left">
                     <div class="channel-icon" style="color:var(--accent-cobalt);">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     </div>
                     <div>
                       <div style="font-family:var(--font-display); font-weight:700; font-size:1rem; color:#fff;">Updates Channel (Latest Bots &amp; Websites)</div>
                       <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://t.me/Trivioner</div>
                     </div>
                   </div>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
 
                 <a href="https://github.com/imarop" target="_blank" rel="noopener noreferrer" class="channel-card">
@@ -2239,10 +1145,9 @@
                       <div style="font-family:var(--font-mono); font-size:0.73rem; color:var(--text-secondary);">https://github.com/imarop</div>
                     </div>
                   </div>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00F5A0" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </a>
               </div>
-
             </div>
           </div>
         </div>
@@ -2261,33 +1166,28 @@
   <!-- =====================================================================
        FULLSCREEN ZOOM TAKEOVER 1: DATE ANYONE ROBOT
        ===================================================================== -->
-  <div id="takeover-datebot" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkDateTitle">
-    <div class="takeover-panel" onclick="event.stopPropagation();">
-      
+  <div id="takeover-datebot" class="takeover-backdrop" onclick="if(event.target===this)window.closeCardModal('datebot',event);">
+    <div class="takeover-panel">
       <div class="takeover-header">
         <div style="display:flex; align-items:center; gap:0.95rem;">
           <div class="work-logo" style="border-color:var(--accent-crimson);">
             <img 
-              class="smart-img"
-              src="https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
-              data-wp="https://i0.wp.com/i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
-              data-raw="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg"
-              alt="Date Anyone Robot Logo" 
-              referrerpolicy="no-referrer"
+              src="https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg" 
+              alt="Date Anyone Robot" 
+              onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/TMBM7tgV/IMG-20261029-095629-182.jpg';}"
             />
-            <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-crimson);">DA</div>
           </div>
           <div>
             <div class="work-badge badge-crimson">PROJECT CASE STUDY // CARD 01</div>
-            <h3 id="tkDateTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+            <h3 style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
               Date Anyone Robot (DateanyoneRobot)
             </h3>
           </div>
         </div>
-        <button type="button" id="closeTkDateBtn" class="close-takeover-btn" onclick="closeTakeover('datebot')">
+        <a href="#work" class="close-takeover-btn" onclick="window.closeCardModal('datebot', event)">
           <span>Close</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
       </div>
 
       <div class="work-quote" style="border-left-color:var(--accent-crimson);">
@@ -2295,26 +1195,14 @@
       </div>
 
       <div class="kpi-grid">
-        <div class="kpi-box">
-          <div class="kpi-num">7,000+</div>
-          <div class="kpi-lbl">Registered Bot Users</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num" style="color:#FF8096;">11,000+</div>
-          <div class="kpi-lbl">Encrypted Photos</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num" style="color:var(--accent-mint);">3,000+</div>
-          <div class="kpi-lbl">Live Chat Stress-Tested</div>
-        </div>
-        <div class="kpi-box">
-          <div class="kpi-num" style="color:var(--accent-volt);">2 AI Servers</div>
-          <div class="kpi-lbl">Vision Moderation</div>
-        </div>
+        <div class="kpi-box"><div class="kpi-num">7,000+</div><div class="kpi-lbl">Registered Bot Users</div></div>
+        <div class="kpi-box"><div class="kpi-num" style="color:#FF8096;">11,000+</div><div class="kpi-lbl">Encrypted Photos</div></div>
+        <div class="kpi-box"><div class="kpi-num" style="color:var(--accent-mint);">3,000+</div><div class="kpi-lbl">Live Chat Stress-Tested</div></div>
+        <div class="kpi-box"><div class="kpi-num" style="color:var(--accent-volt);">2 AI Servers</div><div class="kpi-lbl">Vision Moderation</div></div>
       </div>
 
       <div class="arch-flow">
-        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase; letter-spacing:0.08em;">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-volt); text-transform:uppercase;">
           HOW THE DUAL AI SERVER &amp; ENCRYPTED STORAGE PIPELINE WORKS
         </div>
         <div class="arch-nodes">
@@ -2349,7 +1237,6 @@
             Users create safe profiles with their picture, video, age, and details. They can browse through profiles—clicking Like notifies the other person immediately, while the Match Engine displays mutual matches so users can connect, chat, send messages, or report profiles.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">02 // RAM-LINKED RANDOM CHAT QUEUE</div>
           <h4 class="module-title">In-Memory Queue &amp; In-Chat Matching</h4>
@@ -2357,7 +1244,6 @@
             Random 1-on-1 chat runs directly in RAM link. Even if 100 people are waiting in the queue, clicking chat pairs two users immediately. Users can also click “Match” right inside a conversation if both want to connect.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">03 // MINI WEB APP &amp; POINTS ECONOMY</div>
           <h4 class="module-title">Custom Filters, Points System &amp; Shop</h4>
@@ -2365,7 +1251,6 @@
             Both discovery and live chat feature preference filtering powered by Bot Points. Points are earned via a custom security-hardened Mini Web App integrated with Adscram AI, user referrals, or Telegram Stars conversion, alongside an in-bot Shop.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">04 // ENGINEERED FOR THOUSANDS OF USERS</div>
           <h4 class="module-title">Stress-Tested for 3,000+ Concurrent Live Chatters</h4>
@@ -2375,63 +1260,52 @@
         </div>
       </div>
 
-      <div>
-        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
-          OFFICIAL PROJECT LINKS &amp; CHANNELS
-        </div>
-        <div class="ext-links-grid">
-          <a href="https://t.me/DateanyoneRobot" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-crimson); background:rgba(255,46,84,0.14);">
-            <span>Launch Bot (DateanyoneRobot)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-          <a href="https://t.me/Dateanyonebotproofs" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-            <span>Verified Stars Channel (Dateanyonebotproofs)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-          <a href="https://t.me/Datingbot_chat" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-            <span>Community Group (Datingbot_chat)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-          <a href="https://t.me/Date_anyone_channel" target="_blank" rel="noopener noreferrer" class="ext-link-card">
-            <span>Bot Updates Channel (Date_anyone_channel)</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </a>
-        </div>
+      <div class="ext-links-grid">
+        <a href="https://t.me/DateanyoneRobot" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-crimson); background:rgba(255,46,84,0.14);">
+          <span>Launch Bot (DateanyoneRobot)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="https://t.me/Dateanyonebotproofs" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Verified Stars Channel (Dateanyonebotproofs)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="https://t.me/Datingbot_chat" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Community Group (Datingbot_chat)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="https://t.me/Date_anyone_channel" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Bot Updates Channel (Date_anyone_channel)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
       </div>
-
     </div>
   </div>
 
   <!-- =====================================================================
        FULLSCREEN ZOOM TAKEOVER 2: COMMAND HUB
        ===================================================================== -->
-  <div id="takeover-cmdhub" class="takeover-backdrop" role="dialog" aria-modal="true" aria-labelledby="tkCmdTitle">
-    <div class="takeover-panel" onclick="event.stopPropagation();">
-      
+  <div id="takeover-cmdhub" class="takeover-backdrop" onclick="if(event.target===this)window.closeCardModal('cmdhub',event);">
+    <div class="takeover-panel">
       <div class="takeover-header">
         <div style="display:flex; align-items:center; gap:0.95rem;">
           <div class="work-logo" style="border-color:var(--accent-cobalt);">
             <img 
-              class="smart-img"
-              src="https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
-              data-wp="https://i0.wp.com/i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
-              data-raw="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg"
-              alt="Command Hub Logo" 
-              referrerpolicy="no-referrer"
+              src="https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg" 
+              alt="Command Hub" 
+              onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='https://wsrv.nl/?url=https://i.ibb.co/6JmDgwfr/IMG-20261029-100531-406.jpg';}"
             />
-            <div class="medallion-fallback" style="font-family:var(--font-display); font-weight:800; color:var(--accent-cobalt);">CH</div>
           </div>
           <div>
             <div class="work-badge badge-cobalt">PROJECT CASE STUDY // CARD 02</div>
-            <h3 id="tkCmdTitle" style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+            <h3 style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
               COMMAND HUB (CommandHUBRoBOT)
             </h3>
           </div>
         </div>
-        <button type="button" id="closeTkCmdBtn" class="close-takeover-btn" onclick="closeTakeover('cmdhub')">
+        <a href="#work" class="close-takeover-btn" onclick="window.closeCardModal('cmdhub', event)">
           <span>Close</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
       </div>
 
       <div class="work-quote" style="border-left-color:var(--accent-cobalt);">
@@ -2439,7 +1313,7 @@
       </div>
 
       <div class="arch-flow">
-        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-cobalt); text-transform:uppercase; letter-spacing:0.08em;">
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-cobalt); text-transform:uppercase;">
           HOW COMMAND HUB PROTECTS &amp; ENTERTAINS TELEGRAM GROUPS
         </div>
         <div class="arch-nodes">
@@ -2474,7 +1348,6 @@
             Includes a companion website and complete group controller. Set member CAPTCHAs, cap how many people can join, configure automated Welcome/Goodbye messages and Group Rules, and schedule exact times when the group automatically closes (locking chat) and re-opens.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">02 // BIO-LINK &amp; PROMOTION DETECTION</div>
           <h4 class="module-title">Smart Bio Scanner, Keyword Filters &amp; Blacklists</h4>
@@ -2482,7 +1355,6 @@
             Automatically detects if someone has a link in their Telegram bio or is trying to promote something in chat. Supports anti-flood limits, custom word filters that auto-delete messages and warn users, and link/invite blacklisting.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">03 // MEDIA PERMISSIONS &amp; ADMIN COMMANDS</div>
           <h4 class="module-title">Sticker Whitelist, Warn, Kick, Ban &amp; Purge</h4>
@@ -2490,7 +1362,6 @@
             Whitelist specific stickers so only approved stickers can be sent, stop users from sending photos or videos, and moderate effortlessly with warn, kick, ban, and message deletion from anywhere in the chat.
           </p>
         </div>
-
         <div class="module-box">
           <div class="module-tag">04 // BUILT-IN MULTIPLAYER GAMES &amp; MEMES</div>
           <h4 class="module-title">7+ Interactive Group Games</h4>
@@ -2500,11 +1371,75 @@
         </div>
       </div>
 
-      <div>
-        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.75rem;">
-          OFFICIAL COMMAND HUB LINKS
+      <div class="ext-links-grid">
+        <a href="https://t.me/CommandHUBRoBOT" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-cobalt); background:rgba(59,130,246,0.14);">
+          <span>Launch COMMAND HUB (CommandHUBRoBOT)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Updates Channel (t.me/Trivioner)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FULLSCREEN ZOOM TAKEOVER 3: MORE PROJECTS & CUSTOM CLIENT BUILDS
+       ===================================================================== -->
+  <div id="takeover-morework" class="takeover-backdrop" onclick="if(event.target===this)window.closeCardModal('morework',event);">
+    <div class="takeover-panel">
+      <div class="takeover-header">
+        <div style="display:flex; align-items:center; gap:0.95rem;">
+          <div class="work-logo" style="border-color:var(--accent-volt); color:var(--accent-volt);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="work-badge badge-volt">EXPANDING DECK // CLIENT &amp; FUTURE PROJECTS</div>
+            <h3 style="font-family:var(--font-display); font-weight:800; font-size:clamp(1.25rem, 3vw, 1.8rem); color:#fff;">
+              More Projects &amp; Custom Client Work
+            </h3>
+          </div>
         </div>
-        <div class="ext-links-grid">
-          <a href="https://t.me/CommandHUBRoBOT" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-cobalt); background:rgba(59,130,246,0.14);">
-            <span>Launch COMMAND HUB (CommandHUBRoBOT)</span>
-            <svg width="15" height="15" viewBox="0 0 24
+        <a href="#work" class="close-takeover-btn" onclick="window.closeCardModal('morework', event)">
+          <span>Close</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      </div>
+
+      <div class="work-quote" style="border-left-color:var(--accent-volt);">
+        “Date Anyone Robot and Command Hub are just two featured examples—more of my projects will continue to be added to this card deck, and I also build custom projects for clients.”
+      </div>
+
+      <div class="module-grid">
+        <div class="module-box">
+          <div class="module-tag">01 // GROWING PROJECT ARCHIVE</div>
+          <h4 class="module-title">More Projects Added Over Time</h4>
+          <p class="module-desc">
+            I have built many full-stack websites, Telegram bots, and automation tools. As I release new systems and document more of my builds, new cards will be added right into this revolving deck.
+          </p>
+        </div>
+        <div class="module-box">
+          <div class="module-tag">02 // CUSTOM CLIENT DEVELOPMENT</div>
+          <h4 class="module-title">Available for Custom Websites, Bots &amp; WebApps</h4>
+          <p class="module-desc">
+            I handle client projects end-to-end—whether you need a full-stack web platform, a custom Telegram bot with Mini Web App integration, AI moderation pipelines, or a scalable database backend.
+          </p>
+        </div>
+      </div>
+
+      <div class="ext-links-grid">
+        <a href="https://t.me/Trivioner?direct" target="_blank" rel="noopener noreferrer" class="ext-link-card" style="border-color:var(--accent-volt); background:rgba(212,255,0,0.12);">
+          <span>Discuss a Custom Project (t.me/Trivioner?direct)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="https://t.me/Trivioner" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+          <span>Follow Latest Releases (t.me/Trivioner)</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
